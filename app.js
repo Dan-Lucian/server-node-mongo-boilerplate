@@ -1,7 +1,11 @@
 const express = require('express');
 require('express-async-errors');
 const cors = require('cors');
-const middleware = require('./utils/middleware');
+
+// middleware
+const handlerError = require('./middleware/handler-error');
+const loggerRequest = require('./middleware/logger-request');
+const extractorUser = require('./middleware/extractor-user');
 
 // routes
 const routerBlogs = require('./features/blogs/blogs.controller');
@@ -12,12 +16,11 @@ const app = express();
 app.use(cors());
 app.use(express.static('build'));
 app.use(express.json());
-app.use(middleware.loggerRequest);
+app.use(loggerRequest);
 
 app.use('/accounts', routerAccounts);
-app.use('/blogs', middleware.extractorUser, routerBlogs);
+app.use('/blogs', extractorUser, routerBlogs);
 
-app.use(middleware.endpointUknown);
-app.use(middleware.handlerError);
+app.use(handlerError);
 
 module.exports = app;
