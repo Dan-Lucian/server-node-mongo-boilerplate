@@ -1,7 +1,7 @@
-import http from 'http';
-import app from './app.js';
-import { PORT } from './utils/config.js';
-import logger from './utils/logger.js';
+const http = require('http');
+const app = require('./app');
+const { PORT } = require('./utils/config');
+const logger = require('./utils/logger');
 
 const server = http.createServer(app);
 

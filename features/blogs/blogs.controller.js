@@ -1,5 +1,5 @@
-import express from 'express';
-import Blog from './blogs.model.js';
+const express = require('express');
+const Blog = require('./blogs.model');
 
 const routerBlogs = express.Router();
 
@@ -85,4 +85,4 @@ routerBlogs.put('/:id', async (request, response) => {
   response.json(blogUpdated);
 });
 
-export default routerBlogs;
+module.exports = routerBlogs;

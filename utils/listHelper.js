@@ -73,4 +73,4 @@ const mostLikes = (arrayBlogs) => {
   return arrayBlogs.length === 0 ? null : { ...authorWithMostLikes };
 };
 
-export { listHelper, totalLikes, favoriteBlog, mostBlogs, mostLikes };
+module.exports = { listHelper, totalLikes, favoriteBlog, mostBlogs, mostLikes };

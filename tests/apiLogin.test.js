@@ -1,9 +1,9 @@
-import supertest from 'supertest';
-import mongoose from 'mongoose';
-import jwt from 'jsonwebtoken';
-import User from '../models/user.js';
-import app from '../app.js';
-import { SECRET } from '../utils/config.js';
+const supertest = require('supertest');
+const mongoose = require('mongoose');
+const jwt = require('jsonwebtoken');
+const User = require('../models/user');
+const app = require('../app');
+const { SECRET } = require('../utils/config');
 
 const api = supertest(app);
 

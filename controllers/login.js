@@ -1,8 +1,8 @@
-import express from 'express';
-import bcrypt from 'bcrypt';
-import jwt from 'jsonwebtoken';
-import User from '../models/user.js';
-import { SECRET } from '../utils/config.js';
+const express = require('express');
+const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
+const User = require('../models/user');
+const { SECRET } = require('../utils/config');
 
 const routerLogin = express.Router();
 
@@ -21,4 +21,4 @@ routerLogin.post('/', async (request, response) => {
   response.status(200).json({ token, username, name: user.name });
 });
 
-export default routerLogin;
+module.exports = routerLogin;

@@ -1,5 +1,5 @@
 /* eslint-disable prefer-destructuring */
-import 'dotenv/config';
+require('dotenv').config();
 
 const PORT = process.env.PORT;
 
@@ -13,4 +13,4 @@ const SECRET =
     ? process.env.TEST_SECRET
     : process.env.SECRET;
 
-export { PORT, MONGODB_URI, SECRET };
+module.exports = { PORT, MONGODB_URI, SECRET };

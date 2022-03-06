@@ -1,10 +1,10 @@
-import {
+const {
   listHelper,
   totalLikes,
   favoriteBlog,
   mostBlogs,
   mostLikes,
-} from '../utils/listHelper.js';
+} = require('../utils/listHelper');
 
 const listWithOneBlog = [
   {

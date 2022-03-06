@@ -1,4 +1,4 @@
-import mongoose from 'mongoose';
+const mongoose = require('mongoose');
 
 const schemaBlog = new mongoose.Schema({
   author: String,
@@ -28,4 +28,4 @@ schemaBlog.set('toJSON', {
 
 const Blog = mongoose.model('Blog', schemaBlog);
 
-export default Blog;
+module.exports = Blog;

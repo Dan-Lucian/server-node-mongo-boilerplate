@@ -1,10 +1,10 @@
-import mongoose from 'mongoose';
-import supertest from 'supertest';
-import bcrypt from 'bcrypt';
-import Blog from '../models/blog.js';
-import User from '../models/user.js';
-import app from '../app.js';
-import { blogsInitial, blogsInDb, getANonExistingId } from './helperTests';
+const mongoose = require('mongoose');
+const supertest = require('supertest');
+const bcrypt = require('bcrypt');
+const Blog = require('../features/blogs/blogs.model');
+const User = require('../models/user');
+const app = require('../app');
+const { blogsInitial, blogsInDb, getANonExistingId } = require('./helperTests');
 
 const api = supertest(app);
 

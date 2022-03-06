@@ -1,15 +1,15 @@
-import express from 'express';
-import 'express-async-errors';
-import mongoose from 'mongoose';
-import cors from 'cors';
-import { MONGODB_URI } from './utils/config.js';
-import logger from './utils/logger.js';
-import middleware from './utils/middleware.js';
+const express = require('express');
+require('express-async-errors');
+const mongoose = require('mongoose');
+const cors = require('cors');
+const { MONGODB_URI } = require('./utils/config');
+const logger = require('./utils/logger');
+const middleware = require('./utils/middleware');
 
 // routes
-import routerBlogs from './features/blogs/blogs.controller.js';
-import routerUsers from './controllers/users.js';
-import routerLogin from './controllers/login.js';
+const routerBlogs = require('./features/blogs/blogs.controller');
+const routerUsers = require('./controllers/users');
+const routerLogin = require('./controllers/login');
 
 const app = express();
 
@@ -34,4 +34,4 @@ app.use('/api/blogs', middleware.extractorUser, routerBlogs);
 app.use(middleware.endpointUknown);
 app.use(middleware.handlerError);
 
-export default app;
+module.exports = app;

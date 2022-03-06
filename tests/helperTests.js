@@ -1,5 +1,5 @@
-import Blog from '../models/blog.js';
-import User from '../models/user.js';
+const Blog = require('../features/blogs/blogs.model');
+const User = require('../models/user');
 
 const blogsInitial = [
   {
@@ -54,4 +54,10 @@ const usersInDb = async () => {
   return users.map((user) => user.toJSON());
 };
 
-export { blogsInitial, blogsInDb, getANonExistingId, usersInDb, usersInitial };
+module.exports = {
+  blogsInitial,
+  blogsInDb,
+  getANonExistingId,
+  usersInDb,
+  usersInitial,
+};

@@ -1,7 +1,7 @@
-import jwt from 'jsonwebtoken';
-import logger from './logger.js';
-import User from '../models/user.js';
-import { SECRET } from './config.js';
+const jwt = require('jsonwebtoken');
+const logger = require('./logger');
+const User = require('../models/user');
+const { SECRET } = require('./config');
 
 const loggerRequest = (request, response, next) => {
   logger.info('Method:', request.method);
@@ -45,11 +45,9 @@ const extractorUser = async (request, response, next) => {
   next();
 };
 
-const middleware = {
+module.exports = {
   loggerRequest,
   endpointUknown,
   handlerError,
   extractorUser,
 };
-
-export default middleware;
