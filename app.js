@@ -5,7 +5,9 @@ import cors from 'cors';
 import { MONGODB_URI } from './utils/config.js';
 import logger from './utils/logger.js';
 import middleware from './utils/middleware.js';
-import routerBlogs from './controllers/blogs.js';
+
+// routes
+import routerBlogs from './features/blogs/blogs.controller.js';
 import routerUsers from './controllers/users.js';
 import routerLogin from './controllers/login.js';
 
