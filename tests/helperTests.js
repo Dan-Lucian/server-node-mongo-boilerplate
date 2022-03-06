@@ -1,5 +1,5 @@
 const Blog = require('../features/blogs/blogs.model');
-const User = require('../models/user');
+const db = require('../utils/db');
 
 const blogsInitial = [
   {
@@ -50,7 +50,7 @@ const usersInitial = [
 ];
 
 const usersInDb = async () => {
-  const users = await User.find({});
+  const users = await db.Account.find({});
   return users.map((user) => user.toJSON());
 };
 

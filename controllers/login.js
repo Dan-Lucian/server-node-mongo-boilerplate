@@ -1,7 +1,7 @@
 const express = require('express');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-const User = require('../models/user');
+const db = require('../utils/db');
 const { SECRET } = require('../utils/config');
 
 const routerLogin = express.Router();
@@ -9,7 +9,7 @@ const routerLogin = express.Router();
 routerLogin.post('/', async (request, response) => {
   const { username, password } = request.body;
 
-  const user = await User.findOne({ username });
+  const user = await db.Account.findOne({ username });
   const isPasswordCorrect =
     user === null ? false : await bcrypt.compare(password, user.passwordHash);
 

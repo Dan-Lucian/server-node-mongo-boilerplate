@@ -1,6 +1,6 @@
 const jwt = require('jsonwebtoken');
 const logger = require('./logger');
-const User = require('../models/user');
+const db = require('./db');
 const { SECRET } = require('./config');
 
 const loggerRequest = (request, response, next) => {
@@ -38,7 +38,7 @@ const extractorUser = async (request, response, next) => {
   if (authorization && authorization.toLowerCase().startsWith('bearer ')) {
     const tokenDecoded = jwt.verify(authorization.substring(7), SECRET);
     if (tokenDecoded) {
-      request.user = await User.findById(tokenDecoded.id);
+      request.user = await db.Account.findById(tokenDecoded.id);
     }
   }
 

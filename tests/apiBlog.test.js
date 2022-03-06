@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 const supertest = require('supertest');
 const bcrypt = require('bcrypt');
 const Blog = require('../features/blogs/blogs.model');
-const User = require('../models/user');
+const db = require('../utils/db');
 const app = require('../app');
 const { blogsInitial, blogsInDb, getANonExistingId } = require('./helperTests');
 
@@ -11,11 +11,11 @@ const api = supertest(app);
 let tokenValid;
 let tokenValidOther;
 beforeAll(async () => {
-  await User.deleteMany({});
+  await db.Account.deleteMany({});
 
   const passwordHash = await bcrypt.hash('admin', 10);
-  const user = new User({ username: 'admin', passwordHash });
-  const user2 = new User({ username: 'admin2', passwordHash });
+  const user = new db.Account({ username: 'admin', passwordHash });
+  const user2 = new db.Account({ username: 'admin2', passwordHash });
 
   await user.save();
   await user2.save();
@@ -114,7 +114,7 @@ describe('Addition of a blog', () => {
     const blogsAtEnd = await blogsInDb();
     expect(blogsAtEnd).toHaveLength(blogsInitial.length + 1);
 
-    const user = await User.findById(response.body.user);
+    const user = await db.Account.findById(response.body.user);
     const blogInDb = await Blog.findOne(blogToAdd);
     expect(blogInDb.user).toEqual(user._id);
     expect(blogInDb.author).toEqual(blogToAdd.author);

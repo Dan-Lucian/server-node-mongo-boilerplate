@@ -1,7 +1,7 @@
 const supertest = require('supertest');
 const mongoose = require('mongoose');
 const jwt = require('jsonwebtoken');
-const User = require('../models/user');
+const db = require('../utils/db');
 const app = require('../app');
 const { SECRET } = require('../utils/config');
 
@@ -9,9 +9,9 @@ const api = supertest(app);
 
 describe('Login', () => {
   beforeEach(async () => {
-    await User.deleteMany({});
+    await db.Account.deleteMany({});
 
-    const user = new User({
+    const user = new db.Account({
       username: 'admin',
       name: 'admin',
       passwordHash:

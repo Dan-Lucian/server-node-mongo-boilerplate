@@ -1,7 +1,7 @@
 const supertest = require('supertest');
 const bcrypt = require('bcrypt');
 const mongoose = require('mongoose');
-const User = require('../models/user');
+const db = require('../utils/db');
 const app = require('../app');
 const { usersInDb } = require('./helperTests');
 
@@ -9,10 +9,10 @@ const api = supertest(app);
 
 describe('When there is already a user in the db', () => {
   beforeEach(async () => {
-    await User.deleteMany({});
+    await db.Account.deleteMany({});
 
     const passwordHash = await bcrypt.hash('admin', 10);
-    const user = new User({ username: 'admin', passwordHash });
+    const user = new db.Account({ username: 'admin', passwordHash });
 
     await user.save();
   });
@@ -59,7 +59,9 @@ describe('When there is already a user in the db', () => {
         .expect(201)
         .expect('Content-Type', /application\/json/);
 
-      const userFromDb = await User.findOne({ username: userNew.username });
+      const userFromDb = await db.Account.findOne({
+        username: userNew.username,
+      });
       const match = await bcrypt.compare(
         userNew.password,
         userFromDb.passwordHash

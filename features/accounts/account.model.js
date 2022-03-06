@@ -15,10 +15,10 @@ const schemaUser = mongoose.Schema({
 });
 
 schemaUser.set('toJSON', {
+  virtuals: true,
+  versionKey: false,
   transform: (document, objectReturned) => {
-    objectReturned.id = objectReturned._id.toString();
     delete objectReturned._id;
-    delete objectReturned.__v;
     delete objectReturned.passwordHash;
   },
 });
