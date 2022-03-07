@@ -62,10 +62,11 @@ async function verifyEmail({ token }) {
 
 async function authenticate({ email, password, ipAddress }) {
   const account = await db.Account.findOne({ email });
+  if (!account) throw 'Email or password is incorrect';
 
   const didHashMatch = await bcrypt.compare(password, account.passwordHash);
 
-  if (!account || !account.isVerified || !didHashMatch) {
+  if (!account.isVerified || !didHashMatch) {
     throw 'Email or password is incorrect';
   }
 
@@ -258,8 +259,17 @@ function getStringRandomForToken() {
 }
 
 function getDetailsBasic(account) {
-  const { id, firstname, lastname, email, role, created, updated, isVerified } =
-    account;
+  const {
+    id,
+    userName,
+    firstname,
+    lastname,
+    email,
+    role,
+    created,
+    updated,
+    isVerified,
+  } = account;
 
   return {
     id,
@@ -270,6 +280,7 @@ function getDetailsBasic(account) {
     created,
     updated,
     isVerified,
+    userName,
   };
 }
 

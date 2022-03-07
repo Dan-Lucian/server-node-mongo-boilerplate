@@ -27,7 +27,7 @@ POST  http://localhost:8000/api/users
 Content-Type: application/json
 
 {
-  "username": "admin 2",
+  "userName": "admin 2",
   "name": "Dan",
   "password": "admin",
   "blogs": []
@@ -38,7 +38,7 @@ POST  http://localhost:8000/api/login
 Content-Type: application/json
 
 {
-  "username": "admin",
+  "userName": "admin",
   "password": "admin"
 }
 ###

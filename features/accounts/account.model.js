@@ -2,18 +2,18 @@ const mongoose = require('mongoose');
 
 const schemaAccount = mongoose.Schema({
   email: { type: String, unique: true, required: true },
-  username: {
+  userName: {
     type: String,
     minLength: 3,
     unique: true,
     required: true,
   },
-  firstname: {
+  firstName: {
     type: String,
     minLength: 2,
     required: true,
   },
-  lastname: {
+  lastName: {
     type: String,
     minLength: 2,
     required: true,

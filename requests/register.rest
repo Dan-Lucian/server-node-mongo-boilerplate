@@ -3,9 +3,9 @@ POST  http://localhost:8000/accounts/register
 Content-Type: application/json
 
 {
-    "username": "admin2",
-    "firstname": "Daniel",
-    "lastname": "Brooks",
+    "userName": "admin",
+    "firstName": "first name",
+    "lastName": "last name",
     "email": "steve.lynch47@ethereal.email",
     "password": "admin",
     "passwordConfirm": "admin"
@@ -16,7 +16,7 @@ POST  http://localhost:8000/accounts/verify-email
 Content-Type: application/json
 
 {
-  "token": "af6df251538f5a0215af9c96b10db2d8e958dc937f98ca17ea0886271288f255d6666323902d39b0"
+  "token": "1affc076a1f391a06f52acea600a9d60a3f432a2272a0ed9da6d8cd2e8cf64db7a7a90b733583539"
 }
 
 ###
@@ -24,12 +24,10 @@ POST  http://localhost:8000/accounts/authenticate
 Content-Type: application/json
 
 {
-  "email": "admin.mail@mail.com",
+  "email": "steve.lynch47@ethereal.email",
   "password": "admin"
 }
 
-  # "email": "steve.lynch47@ethereal.email",
-  # "email": "admin.mail@mail.com",
 ###
 POST  http://localhost:8000/accounts/refresh-token
 ###
@@ -58,7 +56,7 @@ Content-Type: application/json
 
 ###
 GET  http://localhost:8000/accounts/
-Authorization: bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI2MjI2MTQ5ZjExMzM2ODQxN2Q3ZDcwNWQiLCJpZCI6IjYyMjYxNDlmMTEzMzY4NDE3ZDdkNzA1ZCIsImlhdCI6MTY0NjY2ODMwMiwiZXhwIjoxNjQ2NjY5MjAyfQ.iQcfmzHZc1H4RVQnF2dTq09NLUZ3aolSMYfDWOfSDpE
+Authorization: bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI2MjI2M2Q2ODcwYzFiOGZkMzJmMmVhYTIiLCJpZCI6IjYyMjYzZDY4NzBjMWI4ZmQzMmYyZWFhMiIsImlhdCI6MTY0NjY3MzMzNSwiZXhwIjoxNjQ2Njc0MjM1fQ.kOHAVAxV3xDT7SLW4DxhHXXIncrGFGZMI9vT8jqvwNU
 ###
 
 GET  http://localhost:8000/accounts/6226149f113368417d7d705f
@@ -67,3 +65,18 @@ Authorization: bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI2MjI1ZmJjZ
 
 # "id": "6226149f113368417d7d705d"
 # "id": "6225fbcdd4090bb0b324e8e8"
+
+###
+POST  http://localhost:8000/accounts/
+Authorization: bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI2MjI2M2Q2ODcwYzFiOGZkMzJmMmVhYTIiLCJpZCI6IjYyMjYzZDY4NzBjMWI4ZmQzMmYyZWFhMiIsImlhdCI6MTY0NjY3MzMzNSwiZXhwIjoxNjQ2Njc0MjM1fQ.kOHAVAxV3xDT7SLW4DxhHXXIncrGFGZMI9vT8jqvwNU
+Content-Type: application/json
+
+{
+  "userName": "newuser",
+  "firstName": "Alex",
+  "lastName": "Cant",
+  "email": "mail@mail.com",
+  "password": "admin",
+  "passwordConfirm": "admin",
+  "role": "User"
+}

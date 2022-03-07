@@ -11,7 +11,9 @@ function errorHandler(error, request, response, next) {
 
     case error.name === 'ValidationError':
       // mongoose validation error
-      return response.status(400).json({ message: error.message });
+      return response
+        .status(400)
+        .json({ message: `${error.name}: ${error.message}` });
 
     case error.name === 'UnauthorizedError':
       // jwt authentication error
@@ -21,7 +23,6 @@ function errorHandler(error, request, response, next) {
       return response.status(401).json({ error: 'invalid token' });
 
     default:
-      debugger;
       return response
         .status(500)
         .json({ message: `${error.name}: ${error.message}` });

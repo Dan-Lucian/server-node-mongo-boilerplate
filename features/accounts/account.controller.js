@@ -31,9 +31,9 @@ module.exports = router;
 
 function schemaRegister(request, response, next) {
   const schema = Joi.object({
-    firstname: Joi.string().required(),
-    lastname: Joi.string().required(),
-    username: Joi.string().required(),
+    userName: Joi.string().required(),
+    firstName: Joi.string().required(),
+    lastName: Joi.string().required(),
     email: Joi.string().email().required(),
     password: Joi.string().min(5).required(),
     passwordConfirm: Joi.string().valid(Joi.ref('password')).required(),
@@ -185,27 +185,25 @@ async function getById(request, response, next) {
 
 function schemaCreate(request, response, next) {
   const schema = Joi.object({
-    title: Joi.string().required(),
+    userName: Joi.string().required(),
     firstName: Joi.string().required(),
     lastName: Joi.string().required(),
     email: Joi.string().email().required(),
-    password: Joi.string().min(6).required(),
+    password: Joi.string().min(5).required(),
     passwordConfirm: Joi.string().valid(Joi.ref('password')).required(),
     role: Joi.string().valid(Role.Admin, Role.User).required(),
   });
   validateRequest(request, next, schema);
 }
 
-function create(request, response, next) {
-  accountService
-    .create(request.body)
-    .then((account) => response.json(account))
-    .catch(next);
+async function create(request, response, next) {
+  const account = await accountService.create(request.body);
+  response.json(account);
 }
 
 function schemaUpdate(request, response, next) {
   const schemaRules = {
-    title: Joi.string().empty(''),
+    userName: Joi.string().empty(''),
     firstName: Joi.string().empty(''),
     lastName: Joi.string().empty(''),
     email: Joi.string().email().empty(''),
