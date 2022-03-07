@@ -8,7 +8,7 @@ Content-Type: application/json
     "lastname": "Brooks",
     "email": "steve.lynch47@ethereal.email",
     "password": "admin",
-    "passwordConfirmed": "admin"
+    "passwordConfirm": "admin"
 }
 
 ###
@@ -24,8 +24,8 @@ POST  http://localhost:8000/accounts/authenticate
 Content-Type: application/json
 
 {
-  "email": "admin.mail@mail.com",
-  "password": "admin"
+  "email": "steve.lynch47@ethereal.email",
+  "password": "admin2"
 }
 
 ###
@@ -33,4 +33,23 @@ POST  http://localhost:8000/accounts/refresh-token
 ###
 
 POST  http://localhost:8000/accounts/revoke-token
-Authorization: bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI2MjI1ZmJjZGQ0MDkwYmIwYjMyNGU4ZTgiLCJpZCI6IjYyMjVmYmNkZDQwOTBiYjBiMzI0ZThlOCIsImlhdCI6MTY0NjY2NDA4MywiZXhwIjoxNjQ2NjY0OTgzfQ.7YF3oOGiGzNdRs9FFapX2qvhXWkKkRBEZSfpxo2dPHU
+Authorization: bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI2MjI2MTQ5ZjExMzM2ODQxN2Q3ZDcwNWQiLCJpZCI6IjYyMjYxNDlmMTEzMzY4NDE3ZDdkNzA1ZCIsImlhdCI6MTY0NjY2NjAwMywiZXhwIjoxNjQ2NjY2OTAzfQ.9jjiGoxXIZryHv_zkGCAX0JIzIcKArw6P27NetUn7EE
+
+###
+POST  http://localhost:8000/accounts/forgot-password
+Content-Type: application/json
+Authorization: bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI2MjI2MTQ5ZjExMzM2ODQxN2Q3ZDcwNWQiLCJpZCI6IjYyMjYxNDlmMTEzMzY4NDE3ZDdkNzA1ZCIsImlhdCI6MTY0NjY2NjgzOCwiZXhwIjoxNjQ2NjY3NzM4fQ.LB42dQl7pkjd-yrtvMniX_VCMSbTCNSjq0PccD5g43M
+
+{
+  "email": "steve.lynch47@ethereal.email"
+}
+
+###
+POST  http://localhost:8000/accounts/reset-password
+Content-Type: application/json
+
+{
+  "token": "a99b918e2345d8a32ded4f530ccf4aada87acb6f79029b336b19d835ecba303d0ff236c554f412d9",
+  "password": "admin2",
+  "passwordConfirm": "admin2"
+}

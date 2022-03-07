@@ -9,34 +9,34 @@ const validateRequest = require('../../middleware/validate-request');
 const accountService = require('./account.service');
 
 // routes
-router.post('/register', registerSchema, register);
-router.post('/verify-email', verifyEmailSchema, verifyEmail);
-router.post('/authenticate', authenticateSchema, authenticate);
+router.post('/register', schemaRegister, register);
+router.post('/verify-email', schemaVerifyEmail, verifyEmail);
+router.post('/authenticate', schemaAuthenticate, authenticate);
 router.post('/refresh-token', refreshToken);
-router.post('/revoke-token', authorize(), revokeTokenSchema, revokeToken);
-router.post('/forgot-password', forgotPasswordSchema, forgotPassword);
+router.post('/revoke-token', authorize(), schemaRevokeToken, revokeToken);
+router.post('/forgot-password', schemaForgotPassword, forgotPassword);
 router.post(
   '/validate-reset-token',
-  validateResetTokenSchema,
+  schemaValidateResetToken,
   validateResetToken
 );
-router.post('/reset-password', resetPasswordSchema, resetPassword);
+router.post('/reset-password', schemaResetPassword, resetPassword);
 router.get('/', authorize(Role.Admin), getAll);
 router.get('/:id', authorize(), getById);
-router.post('/', authorize(Role.Admin), createSchema, create);
-router.put('/:id', authorize(), updateSchema, update);
+router.post('/', authorize(Role.Admin), schemaCreate, create);
+router.put('/:id', authorize(), schemaUpdate, update);
 router.delete('/:id', authorize(), _delete);
 
 module.exports = router;
 
-function registerSchema(request, response, next) {
+function schemaRegister(request, response, next) {
   const schema = Joi.object({
     firstname: Joi.string().required(),
     lastname: Joi.string().required(),
     username: Joi.string().required(),
     email: Joi.string().email().required(),
     password: Joi.string().min(5).required(),
-    passwordConfirmed: Joi.string().valid(Joi.ref('password')).required(),
+    passwordConfirm: Joi.string().valid(Joi.ref('password')).required(),
   });
   validateRequest(request, next, schema);
 }
@@ -50,7 +50,7 @@ async function register(request, response, next) {
   });
 }
 
-function verifyEmailSchema(request, response, next) {
+function schemaVerifyEmail(request, response, next) {
   const schema = Joi.object({
     token: Joi.string().required(),
   });
@@ -63,7 +63,7 @@ async function verifyEmail(request, response, next) {
   response.json({ message: 'Verification successful, you can now login' });
 }
 
-function authenticateSchema(request, response, next) {
+function schemaAuthenticate(request, response, next) {
   const schema = Joi.object({
     email: Joi.string().required(),
     password: Joi.string().required(),
@@ -98,7 +98,7 @@ async function refreshToken(request, response, next) {
   response.json(account);
 }
 
-function revokeTokenSchema(request, response, next) {
+function schemaRevokeToken(request, response, next) {
   const schema = Joi.object({
     token: Joi.string().empty(''),
   });
@@ -122,54 +122,44 @@ async function revokeToken(request, response, next) {
   response.json({ message: 'Token revoked' });
 }
 
-function forgotPasswordSchema(request, response, next) {
+function schemaForgotPassword(request, response, next) {
   const schema = Joi.object({
     email: Joi.string().email().required(),
   });
   validateRequest(request, next, schema);
 }
 
-function forgotPassword(request, response, next) {
-  accountService
-    .forgotPassword(request.body, request.get('origin'))
-    .then(() =>
-      response.json({
-        message: 'Please check your email for password reset instructions',
-      })
-    )
-    .catch(next);
+async function forgotPassword(request, response, next) {
+  await accountService.forgotPassword(request.body, request.get('origin'));
+  response.json({
+    message: 'Please check your email for password reset instructions',
+  });
 }
 
-function validateResetTokenSchema(request, response, next) {
+function schemaValidateResetToken(request, response, next) {
   const schema = Joi.object({
     token: Joi.string().required(),
   });
   validateRequest(request, next, schema);
 }
 
-function validateResetToken(request, response, next) {
-  accountService
-    .validateResetToken(request.body)
-    .then(() => response.json({ message: 'Token is valid' }))
-    .catch(next);
+async function validateResetToken(request, response, next) {
+  await accountService.validateResetToken(request.body);
+  response.json({ message: 'Token is valid' });
 }
 
-function resetPasswordSchema(request, response, next) {
+function schemaResetPassword(request, response, next) {
   const schema = Joi.object({
     token: Joi.string().required(),
     password: Joi.string().min(6).required(),
-    confirmPassword: Joi.string().valid(Joi.ref('password')).required(),
+    passwordConfirm: Joi.string().valid(Joi.ref('password')).required(),
   });
   validateRequest(request, next, schema);
 }
 
-function resetPassword(request, response, next) {
-  accountService
-    .resetPassword(request.body)
-    .then(() =>
-      response.json({ message: 'Password reset successful, you can now login' })
-    )
-    .catch(next);
+async function resetPassword(request, response, next) {
+  await accountService.resetPassword(request.body);
+  response.json({ message: 'Password reset successful, you can now login' });
 }
 
 function getAll(request, response, next) {
@@ -196,14 +186,14 @@ function getById(request, response, next) {
     .catch(next);
 }
 
-function createSchema(request, response, next) {
+function schemaCreate(request, response, next) {
   const schema = Joi.object({
     title: Joi.string().required(),
     firstName: Joi.string().required(),
     lastName: Joi.string().required(),
     email: Joi.string().email().required(),
     password: Joi.string().min(6).required(),
-    confirmPassword: Joi.string().valid(Joi.ref('password')).required(),
+    passwordConfirm: Joi.string().valid(Joi.ref('password')).required(),
     role: Joi.string().valid(Role.Admin, Role.User).required(),
   });
   validateRequest(request, next, schema);
@@ -216,14 +206,14 @@ function create(request, response, next) {
     .catch(next);
 }
 
-function updateSchema(request, response, next) {
+function schemaUpdate(request, response, next) {
   const schemaRules = {
     title: Joi.string().empty(''),
     firstName: Joi.string().empty(''),
     lastName: Joi.string().empty(''),
     email: Joi.string().email().empty(''),
     password: Joi.string().min(6).empty(''),
-    confirmPassword: Joi.string().valid(Joi.ref('password')).empty(''),
+    passwordConfirm: Joi.string().valid(Joi.ref('password')).empty(''),
   };
 
   // only admins can update role
@@ -231,7 +221,7 @@ function updateSchema(request, response, next) {
     schemaRules.role = Joi.string().valid(Role.Admin, Role.User).empty('');
   }
 
-  const schema = Joi.object(schemaRules).with('password', 'confirmPassword');
+  const schema = Joi.object(schemaRules).with('password', 'passwordConfirm');
   validateRequest(request, next, schema);
 }
 
