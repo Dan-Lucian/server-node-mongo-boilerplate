@@ -27,3 +27,6 @@ Content-Type: application/json
   "email": "admin.mail@mail.com",
   "password": "admin"
 }
+
+###
+POST  http://localhost:8000/accounts/refresh-token

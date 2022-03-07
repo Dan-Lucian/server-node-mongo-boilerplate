@@ -1,6 +1,7 @@
 const express = require('express');
 require('express-async-errors');
 const cors = require('cors');
+const cookieParser = require('cookie-parser');
 
 // middleware
 const handlerError = require('./middleware/handler-error');
@@ -16,6 +17,7 @@ const app = express();
 app.use(cors());
 app.use(express.static('build'));
 app.use(express.json());
+app.use(cookieParser());
 app.use(loggerRequest);
 
 app.use('/accounts', routerAccounts);
