@@ -24,10 +24,11 @@ POST  http://localhost:8000/accounts/authenticate
 Content-Type: application/json
 
 {
-  "email": "steve.lynch47@ethereal.email",
+  "email": "mail@mail.com",
   "password": "admin"
 }
 
+  # "email": "steve.lynch47@ethereal.email",
 ###
 POST  http://localhost:8000/accounts/refresh-token
 ###
@@ -56,11 +57,11 @@ Content-Type: application/json
 
 ###
 GET  http://localhost:8000/accounts/
-Authorization: bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI2MjI2M2Q2ODcwYzFiOGZkMzJmMmVhYTIiLCJpZCI6IjYyMjYzZDY4NzBjMWI4ZmQzMmYyZWFhMiIsImlhdCI6MTY0NjY3MzMzNSwiZXhwIjoxNjQ2Njc0MjM1fQ.kOHAVAxV3xDT7SLW4DxhHXXIncrGFGZMI9vT8jqvwNU
+Authorization: bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI2MjI2M2Q2ODcwYzFiOGZkMzJmMmVhYTIiLCJpZCI6IjYyMjYzZDY4NzBjMWI4ZmQzMmYyZWFhMiIsImlhdCI6MTY0NjY3Mzc1MCwiZXhwIjoxNjQ2Njc0NjUwfQ.xabZcOrJjgGFn5hVmnx69zln4xzyQTaQ1y-x3A9P_pc
 ###
 
 GET  http://localhost:8000/accounts/6226149f113368417d7d705f
-Authorization: bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI2MjI1ZmJjZGQ0MDkwYmIwYjMyNGU4ZTgiLCJpZCI6IjYyMjVmYmNkZDQwOTBiYjBiMzI0ZThlOCIsImlhdCI6MTY0NjY2ODYxMSwiZXhwIjoxNjQ2NjY5NTExfQ.RUqj_tcVdeAeQ-KXeHmNcT-G9ULrHD8itf2FdTtoSFY
+Authorization: bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI2MjI2M2Q2ODcwYzFiOGZkMzJmMmVhYTIiLCJpZCI6IjYyMjYzZDY4NzBjMWI4ZmQzMmYyZWFhMiIsImlhdCI6MTY0NjY3Mzc1MCwiZXhwIjoxNjQ2Njc0NjUwfQ.xabZcOrJjgGFn5hVmnx69zln4xzyQTaQ1y-x3A9P_pc
 
 
 # "id": "6226149f113368417d7d705d"
@@ -68,7 +69,7 @@ Authorization: bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI2MjI1ZmJjZ
 
 ###
 POST  http://localhost:8000/accounts/
-Authorization: bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI2MjI2M2Q2ODcwYzFiOGZkMzJmMmVhYTIiLCJpZCI6IjYyMjYzZDY4NzBjMWI4ZmQzMmYyZWFhMiIsImlhdCI6MTY0NjY3MzMzNSwiZXhwIjoxNjQ2Njc0MjM1fQ.kOHAVAxV3xDT7SLW4DxhHXXIncrGFGZMI9vT8jqvwNU
+Authorization: bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI2MjI2M2Q2ODcwYzFiOGZkMzJmMmVhYTIiLCJpZCI6IjYyMjYzZDY4NzBjMWI4ZmQzMmYyZWFhMiIsImlhdCI6MTY0NjY3Mzc1MCwiZXhwIjoxNjQ2Njc0NjUwfQ.xabZcOrJjgGFn5hVmnx69zln4xzyQTaQ1y-x3A9P_pc
 Content-Type: application/json
 
 {
@@ -79,4 +80,19 @@ Content-Type: application/json
   "password": "admin",
   "passwordConfirm": "admin",
   "role": "User"
+}
+
+###
+PUT  http://localhost:8000/accounts/62263dd970c1b8fd32f2eab0
+Authorization: bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI2MjI2M2RkOTcwYzFiOGZkMzJmMmVhYjAiLCJpZCI6IjYyMjYzZGQ5NzBjMWI4ZmQzMmYyZWFiMCIsImlhdCI6MTY0NjY3Mzk1OCwiZXhwIjoxNjQ2Njc0ODU4fQ.IWtjGbKdvkIIDSxIBqPaHt1VENWHtWZfcXnmUb3rNbc
+Content-Type: application/json
+
+{
+  "userName": "newuser-modified-again",
+  "firstName": "Alex-v2",
+  "lastName": "Cant",
+  "email": "mail@mail.com",
+  "password": "admin",
+  "passwordConfirm": "admin",
+  "role": "Admin"
 }

@@ -207,7 +207,7 @@ function schemaUpdate(request, response, next) {
     firstName: Joi.string().empty(''),
     lastName: Joi.string().empty(''),
     email: Joi.string().email().empty(''),
-    password: Joi.string().min(6).empty(''),
+    password: Joi.string().min(5).empty(''),
     passwordConfirm: Joi.string().valid(Joi.ref('password')).empty(''),
   };
 
