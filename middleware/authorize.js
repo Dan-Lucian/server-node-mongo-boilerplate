@@ -1,5 +1,5 @@
 const jwt = require('jsonwebtoken');
-const Account = require('../features/accounts/account.model');
+const db = require('../utils/db');
 const TokenRefresh = require('../features/accounts/token-refresh.model');
 const { SECRET } = require('../utils/config');
 
@@ -20,9 +20,8 @@ function authorize(roles = []) {
       if (authorization && authorization.toLowerCase().startsWith('bearer ')) {
         const tokenDecoded = jwt.verify(authorization.substring(7), SECRET);
         request.user = tokenDecoded;
-        // if (tokenDecoded) {
-        //   request.user = await Account.findById(tokenDecoded.id);
-        // }
+      } else {
+        return response.status(401).json({ message: 'Unauthorized' });
       }
 
       next();
@@ -30,7 +29,7 @@ function authorize(roles = []) {
 
     // authorize based on user role
     async (request, response, next) => {
-      const account = await Account.findById(request.user.id);
+      const account = await db.Account.findById(request.user.id);
       const TokensRefresh = await TokenRefresh.find({ account: account.id });
 
       if (

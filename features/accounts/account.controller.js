@@ -105,7 +105,7 @@ function revokeTokenSchema(request, response, next) {
   validateRequest(request, next, schema);
 }
 
-function revokeToken(request, response, next) {
+async function revokeToken(request, response, next) {
   // accept token from request body or cookie
   const token = request.body.token || request.cookies.tokenRefresh;
   const ipAddress = request.ip;
@@ -118,10 +118,8 @@ function revokeToken(request, response, next) {
     return response.status(401).json({ message: 'Unauthorized' });
   }
 
-  accountService
-    .revokeToken({ token, ipAddress })
-    .then(() => response.json({ message: 'Token revoked' }))
-    .catch(next);
+  await accountService.revokeToken({ token, ipAddress });
+  response.json({ message: 'Token revoked' });
 }
 
 function forgotPasswordSchema(request, response, next) {

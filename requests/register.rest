@@ -3,10 +3,10 @@ POST  http://localhost:8000/accounts/register
 Content-Type: application/json
 
 {
-    "username": "admin",
+    "username": "admin2",
     "firstname": "Daniel",
     "lastname": "Brooks",
-    "email": "admin.mail@mail.com",
+    "email": "steve.lynch47@ethereal.email",
     "password": "admin",
     "passwordConfirmed": "admin"
 }
@@ -16,7 +16,7 @@ POST  http://localhost:8000/accounts/verify-email
 Content-Type: application/json
 
 {
-    "token": "36cba2b6566c0212313ff33a6b4e03250a73b16db1590da958d322d350f0b6b7e719eb32a6e74795"
+  "token": "af6df251538f5a0215af9c96b10db2d8e958dc937f98ca17ea0886271288f255d6666323902d39b0"
 }
 
 ###
@@ -30,3 +30,7 @@ Content-Type: application/json
 
 ###
 POST  http://localhost:8000/accounts/refresh-token
+###
+
+POST  http://localhost:8000/accounts/revoke-token
+Authorization: bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI2MjI1ZmJjZGQ0MDkwYmIwYjMyNGU4ZTgiLCJpZCI6IjYyMjVmYmNkZDQwOTBiYjBiMzI0ZThlOCIsImlhdCI6MTY0NjY2NDA4MywiZXhwIjoxNjQ2NjY0OTgzfQ.7YF3oOGiGzNdRs9FFapX2qvhXWkKkRBEZSfpxo2dPHU
