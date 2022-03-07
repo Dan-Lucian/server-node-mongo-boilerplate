@@ -220,7 +220,7 @@ function schemaUpdate(request, response, next) {
   validateRequest(request, next, schema);
 }
 
-function update(request, response, next) {
+async function update(request, response, next) {
   // users can update their own account and admins can update any account
   if (
     request.params.id !== request.user.id &&
@@ -229,13 +229,11 @@ function update(request, response, next) {
     return response.status(401).json({ message: 'Unauthorized' });
   }
 
-  accountService
-    .update(request.params.id, request.body)
-    .then((account) => response.json(account))
-    .catch(next);
+  const account = await accountService.update(request.params.id, request.body);
+  response.json(account);
 }
 
-function _delete(request, response, next) {
+async function _delete(request, response, next) {
   // users can delete their own account and admins can delete any account
   if (
     request.params.id !== request.user.id &&
@@ -244,10 +242,8 @@ function _delete(request, response, next) {
     return response.status(401).json({ message: 'Unauthorized' });
   }
 
-  accountService
-    .delete(request.params.id)
-    .then(() => response.json({ message: 'Account deleted successfully' }))
-    .catch(next);
+  await accountService.delete(request.params.id);
+  response.json({ message: 'Account deleted successfully' });
 }
 
 // helper functions
