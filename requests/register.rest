@@ -24,10 +24,12 @@ POST  http://localhost:8000/accounts/authenticate
 Content-Type: application/json
 
 {
-  "email": "steve.lynch47@ethereal.email",
-  "password": "admin2"
+  "email": "admin.mail@mail.com",
+  "password": "admin"
 }
 
+  # "email": "steve.lynch47@ethereal.email",
+  # "email": "admin.mail@mail.com",
 ###
 POST  http://localhost:8000/accounts/refresh-token
 ###
@@ -53,3 +55,15 @@ Content-Type: application/json
   "password": "admin2",
   "passwordConfirm": "admin2"
 }
+
+###
+GET  http://localhost:8000/accounts/
+Authorization: bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI2MjI2MTQ5ZjExMzM2ODQxN2Q3ZDcwNWQiLCJpZCI6IjYyMjYxNDlmMTEzMzY4NDE3ZDdkNzA1ZCIsImlhdCI6MTY0NjY2ODMwMiwiZXhwIjoxNjQ2NjY5MjAyfQ.iQcfmzHZc1H4RVQnF2dTq09NLUZ3aolSMYfDWOfSDpE
+###
+
+GET  http://localhost:8000/accounts/6226149f113368417d7d705f
+Authorization: bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI2MjI1ZmJjZGQ0MDkwYmIwYjMyNGU4ZTgiLCJpZCI6IjYyMjVmYmNkZDQwOTBiYjBiMzI0ZThlOCIsImlhdCI6MTY0NjY2ODYxMSwiZXhwIjoxNjQ2NjY5NTExfQ.RUqj_tcVdeAeQ-KXeHmNcT-G9ULrHD8itf2FdTtoSFY
+
+
+# "id": "6226149f113368417d7d705d"
+# "id": "6225fbcdd4090bb0b324e8e8"

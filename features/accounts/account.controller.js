@@ -162,14 +162,12 @@ async function resetPassword(request, response, next) {
   response.json({ message: 'Password reset successful, you can now login' });
 }
 
-function getAll(request, response, next) {
-  accountService
-    .getAll()
-    .then((accounts) => response.json(accounts))
-    .catch(next);
+async function getAll(request, response, next) {
+  const accounts = await accountService.getAll();
+  response.json(accounts);
 }
 
-function getById(request, response, next) {
+async function getById(request, response, next) {
   // users can get their own account and admins can get any account
   if (
     request.params.id !== request.user.id &&
@@ -178,12 +176,11 @@ function getById(request, response, next) {
     return response.status(401).json({ message: 'Unauthorized' });
   }
 
-  accountService
-    .getById(request.params.id)
-    .then((account) =>
-      account ? response.json(account) : response.sendStatus(404)
-    )
-    .catch(next);
+  const account = await accountService.getById(request.params.id);
+  if (account) {
+    return response.json(account);
+  }
+  response.sendStatus(404);
 }
 
 function schemaCreate(request, response, next) {
