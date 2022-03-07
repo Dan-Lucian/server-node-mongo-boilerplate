@@ -1,6 +1,6 @@
 const jwt = require('jsonwebtoken');
 const Account = require('../features/accounts/account.model');
-const RefreshToken = require('../features/accounts/refresh-token.model');
+const TokenRefresh = require('../features/accounts/token-refresh.model');
 const { SECRET } = require('../utils/config');
 
 module.exports = authorize;
@@ -31,7 +31,7 @@ function authorize(roles = []) {
     // authorize based on user role
     async (request, response, next) => {
       const account = await Account.findById(request.user.id);
-      const refreshTokens = await RefreshToken.find({ account: account.id });
+      const TokensRefresh = await TokenRefresh.find({ account: account.id });
 
       if (
         !account ||
@@ -44,7 +44,7 @@ function authorize(roles = []) {
       // authentication and authorization successful
       request.user.role = account.role;
       request.user.ownsToken = (token) =>
-        !!refreshTokens.find((x) => x.token === token);
+        !!TokensRefresh.find((x) => x.token === token);
       next();
     },
   ];

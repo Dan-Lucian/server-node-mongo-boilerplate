@@ -1,0 +1,29 @@
+
+POST  http://localhost:8000/accounts/register
+Content-Type: application/json
+
+{
+    "username": "admin",
+    "firstname": "Daniel",
+    "lastname": "Brooks",
+    "email": "admin.mail@mail.com",
+    "password": "admin",
+    "passwordConfirmed": "admin"
+}
+
+###
+POST  http://localhost:8000/accounts/verify-email
+Content-Type: application/json
+
+{
+    "token": "36cba2b6566c0212313ff33a6b4e03250a73b16db1590da958d322d350f0b6b7e719eb32a6e74795"
+}
+
+###
+POST  http://localhost:8000/accounts/authenticate
+Content-Type: application/json
+
+{
+  "email": "admin.mail@mail.com",
+  "password": "admin"
+}

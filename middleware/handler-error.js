@@ -21,6 +21,9 @@ function errorHandler(error, request, response, next) {
       return response.status(401).json({ error: 'invalid token' });
 
     default:
-      return response.status(500).json({ message: error.message });
+      debugger;
+      return response
+        .status(500)
+        .json({ message: `${error.name}: ${error.message}` });
   }
 }

@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 const Account = require('../features/accounts/account.model');
-const RefreshToken = require('../features/accounts/refresh-token.model');
+const TokenRefresh = require('../features/accounts/token-refresh.model');
 const { MONGODB_URI } = require('./config');
 const logger = require('./logger');
 
@@ -15,7 +15,7 @@ mongoose
 
 module.exports = {
   Account,
-  RefreshToken,
+  TokenRefresh,
   isValidId,
 };
 

@@ -9,11 +9,11 @@ const { SECRET } = require('../../utils/config');
 const db = require('../../utils/db');
 
 module.exports = {
+  register,
+  verifyEmail,
   authenticate,
   refreshToken,
   revokeToken,
-  register,
-  verifyEmail,
   forgotPassword,
   validateResetToken,
   resetPassword,
@@ -24,69 +24,11 @@ module.exports = {
   delete: _delete,
 };
 
-async function authenticate({ email, password, ipAddress }) {
-  const account = await db.Account.findOne({ email });
-
-  if (
-    !account ||
-    !account.isVerified ||
-    !bcrypt.compareSync(password, account.passwordHash)
-  ) {
-    throw 'Email or password is incorrect';
-  }
-
-  // authentication successful so generate jwt and refresh tokens
-  const jwtToken = generateJwtToken(account);
-  const refreshToken = generateRefreshToken(account, ipAddress);
-
-  // save refresh token
-  await refreshToken.save();
-
-  // return basic details and tokens
-  return {
-    ...basicDetails(account),
-    jwtToken,
-    refreshToken: refreshToken.token,
-  };
-}
-
-async function refreshToken({ token, ipAddress }) {
-  const refreshToken = await getRefreshToken(token);
-  const { account } = refreshToken;
-
-  // replace old refresh token with a new one and save
-  const newRefreshToken = generateRefreshToken(account, ipAddress);
-  refreshToken.revoked = Date.now();
-  refreshToken.revokedByIp = ipAddress;
-  refreshToken.replacedByToken = newRefreshToken.token;
-  await refreshToken.save();
-  await newRefreshToken.save();
-
-  // generate new jwt
-  const jwtToken = generateJwtToken(account);
-
-  // return basic details and tokens
-  return {
-    ...basicDetails(account),
-    jwtToken,
-    refreshToken: newRefreshToken.token,
-  };
-}
-
-async function revokeToken({ token, ipAddress }) {
-  const refreshToken = await getRefreshToken(token);
-
-  // revoke token and save
-  refreshToken.revoked = Date.now();
-  refreshToken.revokedByIp = ipAddress;
-  await refreshToken.save();
-}
-
 async function register(params, origin) {
   // validate
   if (await db.Account.findOne({ email: params.email })) {
     // send already registered error in email to prevent account enumeration
-    await sendAlreadyRegisteredEmail(params.email, origin);
+    await sendEmailAlreadyRegistered(params.email, origin);
     return;
   }
 
@@ -96,7 +38,7 @@ async function register(params, origin) {
   // first registered account is an admin
   const isFirstAccount = (await db.Account.countDocuments({})) === 0;
   account.role = isFirstAccount ? Role.Admin : Role.User;
-  account.verificationToken = randomTokenString();
+  account.verificationToken = getStringRandomForToken();
 
   // hash password
   account.passwordHash = await hash(params.password);
@@ -105,7 +47,7 @@ async function register(params, origin) {
   await account.save();
 
   // send email
-  await sendVerificationEmail(account, origin);
+  await sendEmailVerification(account, origin);
 }
 
 async function verifyEmail({ token }) {
@@ -118,6 +60,62 @@ async function verifyEmail({ token }) {
   await account.save();
 }
 
+async function authenticate({ email, password, ipAddress }) {
+  const account = await db.Account.findOne({ email });
+
+  const didHashMatch = await bcrypt.compare(password, account.passwordHash);
+
+  if (!account || !account.isVerified || !didHashMatch) {
+    throw 'Email or password is incorrect';
+  }
+
+  // authentication successful so generate jwt and refresh tokens
+  const tokenJwt = generateTokenJwt(account);
+  const tokenRefresh = generateTokenRefresh(account, ipAddress);
+
+  // save refresh token
+  await tokenRefresh.save();
+
+  // return basic details and tokens
+  return {
+    ...getDetailsBasic(account),
+    tokenJwt,
+    tokenRefresh: tokenRefresh.token,
+  };
+}
+
+async function refreshToken({ tokenRefreshReceived, ipAddress }) {
+  const tokenRefresh = await getTokenRefreshFromDb(tokenRefreshReceived);
+  const { account } = tokenRefresh;
+
+  // replace old refresh token with a new one and save
+  const tokenRefreshNew = generateTokenRefresh(account, ipAddress);
+  tokenRefresh.revoked = Date.now();
+  tokenRefresh.revokedByIp = ipAddress;
+  tokenRefresh.replacedByToken = tokenRefreshNew.token;
+  await tokenRefresh.save();
+  await tokenRefreshNew.save();
+
+  // generate new jwt
+  const tokenJwt = generateTokenJwt(account);
+
+  // return basic details and tokens
+  return {
+    ...getDetailsBasic(account),
+    tokenJwt,
+    tokenRefresh: tokenRefreshNew.token,
+  };
+}
+
+async function revokeToken({ token, ipAddress }) {
+  const tokenRefresh = await getTokenRefreshFromDb(token);
+
+  // revoke token and save
+  tokenRefresh.revoked = Date.now();
+  tokenRefresh.revokedByIp = ipAddress;
+  await tokenRefresh.save();
+}
+
 async function forgotPassword({ email }, origin) {
   const account = await db.Account.findOne({ email });
 
@@ -126,13 +124,13 @@ async function forgotPassword({ email }, origin) {
 
   // create reset token that expires after 24 hours
   account.resetToken = {
-    token: randomTokenString(),
+    token: getStringRandomForToken(),
     expires: new Date(Date.now() + 24 * 60 * 60 * 1000),
   };
   await account.save();
 
   // send email
-  await sendPasswordResetEmail(account, origin);
+  await sendEmailResetPassword(account, origin);
 }
 
 async function validateResetToken({ token }) {
@@ -161,12 +159,12 @@ async function resetPassword({ token, password }) {
 
 async function getAll() {
   const accounts = await db.Account.find();
-  return accounts.map((x) => basicDetails(x));
+  return accounts.map((x) => getDetailsBasic(x));
 }
 
 async function getById(id) {
   const account = await getAccount(id);
-  return basicDetails(account);
+  return getDetailsBasic(account);
 }
 
 async function create(params) {
@@ -184,7 +182,7 @@ async function create(params) {
   // save account
   await account.save();
 
-  return basicDetails(account);
+  return getDetailsBasic(account);
 }
 
 async function update(id, params) {
@@ -209,7 +207,7 @@ async function update(id, params) {
   account.updated = Date.now();
   await account.save();
 
-  return basicDetails(account);
+  return getDetailsBasic(account);
 }
 
 async function _delete(id) {
@@ -226,56 +224,47 @@ async function getAccount(id) {
   return account;
 }
 
-async function getRefreshToken(token) {
-  const refreshToken = await db.RefreshToken.findOne({ token }).populate(
+async function getTokenRefreshFromDb(token) {
+  const tokenRefresh = await db.TokenRefresh.findOne({ token }).populate(
     'account'
   );
-  if (!refreshToken || !refreshToken.isActive) throw 'Invalid token';
-  return refreshToken;
+  if (!tokenRefresh || !tokenRefresh.isActive) throw 'Invalid token';
+  return tokenRefresh;
 }
 
 async function hash(password) {
   return bcrypt.hash(password, 10);
 }
 
-function generateJwtToken(account) {
+function generateTokenJwt(account) {
   // create a jwt token containing the account id that expires in 15 minutes
   return jwt.sign({ sub: account.id, id: account.id }, SECRET, {
     expiresIn: '15m',
   });
 }
 
-function generateRefreshToken(account, ipAddress) {
+function generateTokenRefresh(account, ipAddress) {
   // create a refresh token that expires in 7 days
-  return new db.RefreshToken({
+  return new db.TokenRefresh({
     account: account.id,
-    token: randomTokenString(),
-    expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+    token: getStringRandomForToken(),
+    expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // after a week
     createdByIp: ipAddress,
   });
 }
 
-function randomTokenString() {
+function getStringRandomForToken() {
   return crypto.randomBytes(40).toString('hex');
 }
 
-function basicDetails(account) {
-  const {
-    id,
-    title,
-    firstName,
-    lastName,
-    email,
-    role,
-    created,
-    updated,
-    isVerified,
-  } = account;
+function getDetailsBasic(account) {
+  const { id, firstname, lastname, email, role, created, updated, isVerified } =
+    account;
+
   return {
     id,
-    title,
-    firstName,
-    lastName,
+    firstname,
+    lastname,
     email,
     role,
     created,
@@ -284,7 +273,7 @@ function basicDetails(account) {
   };
 }
 
-async function sendVerificationEmail(account, origin) {
+async function sendEmailVerification(account, origin) {
   let message;
   if (origin) {
     const verifyUrl = `${origin}/account/verify-email?token=${account.verificationToken}`;
@@ -304,7 +293,7 @@ async function sendVerificationEmail(account, origin) {
   });
 }
 
-async function sendAlreadyRegisteredEmail(email, origin) {
+async function sendEmailAlreadyRegistered(email, origin) {
   let message;
   if (origin) {
     message = `<p>If you don't know your password please visit the <a href="${origin}/account/forgot-password">forgot password</a> page.</p>`;
@@ -321,7 +310,7 @@ async function sendAlreadyRegisteredEmail(email, origin) {
   });
 }
 
-async function sendPasswordResetEmail(account, origin) {
+async function sendEmailResetPassword(account, origin) {
   let message;
   if (origin) {
     const resetUrl = `${origin}/account/reset-password?token=${account.resetToken.token}`;
