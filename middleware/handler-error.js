@@ -1,3 +1,4 @@
+/* eslint-disable no-nested-ternary */
 /* eslint-disable no-case-declarations */
 module.exports = errorHandler;
 
@@ -6,7 +7,8 @@ function errorHandler(error, request, response, next) {
     case typeof error === 'string':
       // custom application error
       const is404 = error.toLowerCase().endsWith('not found');
-      const statusCode = is404 ? 404 : 400;
+      const is401 = error === 'Incorrect email or password';
+      const statusCode = is404 ? 404 : is401 ? 401 : 400;
       return response.status(statusCode).json({ message: error });
 
     case error.name === 'ValidationError':
@@ -20,7 +22,7 @@ function errorHandler(error, request, response, next) {
       return response.status(401).json({ message: 'Unauthorized' });
 
     case error.name === 'JsonWebTokenError':
-      return response.status(401).json({ error: 'invalid token' });
+      return response.status(401).json({ message: 'invalid token' });
 
     default:
       return response

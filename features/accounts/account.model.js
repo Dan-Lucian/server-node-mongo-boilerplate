@@ -10,12 +10,12 @@ const schemaAccount = mongoose.Schema({
   },
   firstName: {
     type: String,
-    minLength: 2,
+    minLength: 1,
     required: true,
   },
   lastName: {
     type: String,
-    minLength: 2,
+    minLength: 1,
     required: true,
   },
   passwordHash: {

@@ -7,9 +7,13 @@ Content-Type: application/json
     "firstName": "first name",
     "lastName": "last name",
     "email": "steve.lynch47@ethereal.email",
-    "password": "admin",
-    "passwordConfirm": "admin"
+    "password": "admin123",
+    "passwordConfirm": "admin123"
 }
+
+###
+GET  http://localhost:8000/accounts/verify-email?token=1234567890
+Content-Type: application/json
 
 ###
 POST  http://localhost:8000/accounts/verify-email
@@ -24,8 +28,8 @@ POST  http://localhost:8000/accounts/authenticate
 Content-Type: application/json
 
 {
-  "email": "steve.lynch47@ethereal.email",
-  "password": "admin"
+  "email": "test1@mail.com",
+  "password": "12345678"
 }
 
   # "email": "steve.lynch47@ethereal.email",
@@ -34,7 +38,6 @@ POST  http://localhost:8000/accounts/refresh-token
 ###
 
 POST  http://localhost:8000/accounts/revoke-token
-Authorization: bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI2MjI2M2Q2ODcwYzFiOGZkMzJmMmVhYTIiLCJpZCI6IjYyMjYzZDY4NzBjMWI4ZmQzMmYyZWFhMiIsImlhdCI6MTY0NjY3NDQwNSwiZXhwIjoxNjQ2Njc1MzA1fQ.rbnrkxM4YnFb9cGTxrzTBFSpf7-pOGL7Rtv-GOGPnL8
 
 ###
 POST  http://localhost:8000/accounts/forgot-password

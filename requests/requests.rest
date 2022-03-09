@@ -23,14 +23,16 @@ Content-Type: application/json
 Authorization: bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFkbWluMiIsImlkIjoiNjIyMTNjMmZkNDY1NjI1NTk2ZTExYzI1IiwiaWF0IjoxNjQ2MzQ1MzI5fQ.b-oxnEJXsX5UFKK_GUIaXulW8xhUHqPN2yf4V3NYuPI
 ###
 
-POST  http://localhost:8000/api/users
+POST  http://localhost:8000/accounts/register
 Content-Type: application/json
 
 {
-  "userName": "admin 2",
-  "name": "Dan",
-  "password": "admin",
-  "blogs": []
+  "userName": "adam",
+  "firstName": "Adam",
+  "lastName": "Black",
+  "email": "differentTest@mail.com",
+  "password": "12345678",
+  "passwordConfirm": "12345678"
 }
 ###
 

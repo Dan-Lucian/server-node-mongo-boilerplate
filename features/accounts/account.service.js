@@ -27,9 +27,12 @@ module.exports = {
 async function register(params, origin) {
   // validate
   if (await db.Account.findOne({ email: params.email })) {
-    // send already registered error in email to prevent account enumeration
     await sendEmailAlreadyRegistered(params.email, origin);
-    return;
+    throw `email already registered`;
+  }
+
+  if (await db.Account.findOne({ userName: params.userName })) {
+    throw `userName already registered`;
   }
 
   // create account object
@@ -62,12 +65,12 @@ async function verifyEmail({ token }) {
 
 async function authenticate({ email, password, ipAddress }) {
   const account = await db.Account.findOne({ email });
-  if (!account) throw 'Email or password is incorrect';
+  if (!account) throw 'Incorrect email or password';
 
-  const didHashMatch = await bcrypt.compare(password, account.passwordHash);
+  const isHashExact = await bcrypt.compare(password, account.passwordHash);
 
-  if (!account.isVerified || !didHashMatch) {
-    throw 'Email or password is incorrect';
+  if (!account.isVerified || !isHashExact) {
+    throw 'Incorrect email or password';
   }
 
   // authentication successful so generate jwt and refresh tokens
@@ -108,13 +111,13 @@ async function refreshToken({ tokenRefreshReceived, ipAddress }) {
   };
 }
 
-async function revokeToken({ token, ipAddress }) {
-  const tokenRefresh = await getTokenRefreshFromDb(token);
+async function revokeToken({ tokenRefresh, ipAddress }) {
+  const tokenRefreshFound = await getTokenRefreshFromDb(tokenRefresh);
 
   // revoke token and save
-  tokenRefresh.revoked = Date.now();
-  tokenRefresh.revokedByIp = ipAddress;
-  await tokenRefresh.save();
+  tokenRefreshFound.revoked = Date.now();
+  tokenRefreshFound.revokedByIp = ipAddress;
+  await tokenRefreshFound.save();
 }
 
 async function forgotPassword({ email }, origin) {
@@ -262,8 +265,8 @@ function getDetailsBasic(account) {
   const {
     id,
     userName,
-    firstname,
-    lastname,
+    firstName,
+    lastName,
     email,
     role,
     created,
@@ -273,14 +276,14 @@ function getDetailsBasic(account) {
 
   return {
     id,
-    firstname,
-    lastname,
+    userName,
+    firstName,
+    lastName,
     email,
     role,
     created,
     updated,
     isVerified,
-    userName,
   };
 }
 

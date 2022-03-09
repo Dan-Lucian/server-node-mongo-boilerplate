@@ -10,7 +10,8 @@ const accountService = require('./account.service');
 
 // routes
 router.post('/register', schemaRegister, register);
-router.post('/verify-email', schemaVerifyEmail, verifyEmail);
+router.get('/verify-email', verifyEmailWithGet);
+router.post('/verify-email', schemaVerifyEmail, verifyEmailWithPost);
 router.post('/authenticate', schemaAuthenticate, authenticate);
 router.post('/refresh-token', refreshToken);
 router.post('/revoke-token', authorize(), schemaRevokeToken, revokeToken);
@@ -31,11 +32,11 @@ module.exports = router;
 
 function schemaRegister(request, response, next) {
   const schema = Joi.object({
-    userName: Joi.string().required(),
-    firstName: Joi.string().required(),
-    lastName: Joi.string().required(),
+    userName: Joi.string().min(3).required(),
+    firstName: Joi.string().min(1).required(),
+    lastName: Joi.string().min(1).required(),
     email: Joi.string().email().required(),
-    password: Joi.string().min(5).required(),
+    password: Joi.string().min(8).required(),
     passwordConfirm: Joi.string().valid(Joi.ref('password')).required(),
   });
   validateRequest(request, next, schema);
@@ -44,7 +45,7 @@ function schemaRegister(request, response, next) {
 async function register(request, response, next) {
   await accountService.register(request.body, request.get('origin'));
 
-  response.json({
+  response.status(201).json({
     message:
       'Registration successful, please check your email for verification instructions',
   });
@@ -57,8 +58,15 @@ function schemaVerifyEmail(request, response, next) {
   validateRequest(request, next, schema);
 }
 
-async function verifyEmail(request, response, next) {
+async function verifyEmailWithPost(request, response, next) {
   await accountService.verifyEmail(request.body);
+
+  response.json({ message: 'Verification successful, you can now login' });
+}
+
+async function verifyEmailWithGet(request, response, next) {
+  const { token } = request.query;
+  await accountService.verifyEmail({ token });
 
   response.json({ message: 'Verification successful, you can now login' });
 }
@@ -100,25 +108,28 @@ async function refreshToken(request, response, next) {
 
 function schemaRevokeToken(request, response, next) {
   const schema = Joi.object({
-    token: Joi.string().empty(''),
+    tokenRefresh: Joi.string().required(),
   });
   validateRequest(request, next, schema);
 }
 
 async function revokeToken(request, response, next) {
   // accept token from request body or cookie
-  const token = request.body.token || request.cookies.tokenRefresh;
+  const { tokenRefresh } = request.body;
   const ipAddress = request.ip;
 
-  if (!token)
+  if (!tokenRefresh)
     return response.status(400).json({ message: 'Token is required' });
 
   // users can revoke their own tokens and admins can revoke any tokens
-  if (!request.user.ownsToken(token) && request.user.role !== Role.Admin) {
+  if (
+    !request.user.ownsToken(tokenRefresh) &&
+    request.user.role !== Role.Admin
+  ) {
     return response.status(401).json({ message: 'Unauthorized' });
   }
 
-  await accountService.revokeToken({ token, ipAddress });
+  await accountService.revokeToken({ tokenRefresh, ipAddress });
   response.json({ message: 'Token revoked' });
 }
 

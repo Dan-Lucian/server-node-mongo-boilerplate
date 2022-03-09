@@ -1,4 +1,5 @@
 const nodemailer = require('nodemailer');
+const { NODE_ENV } = require('./config');
 
 module.exports = sendEmail;
 
@@ -16,7 +17,11 @@ const configMail = {
 };
 
 async function sendEmail({ to, subject, html, from = configMail.emailFrom }) {
+  if (NODE_ENV === 'test') {
+    console.log(`SENDING EMAIL: ${subject}`);
+    return;
+  }
+
   const transporter = nodemailer.createTransport(configMail.optionsSmtp);
   await transporter.sendMail({ from, to, subject, html });
-  // console.log(`SENDING EMAIL: ${subject}`);
 }
