@@ -40,6 +40,14 @@ const tokenJwtAccountTwo = jwt.sign(
   }
 );
 
+const tokenJwtAccountTwoExpired = jwt.sign(
+  { sub: accountTwo._id, id: accountTwo._id },
+  SECRET,
+  {
+    expiresIn: '1ms',
+  }
+);
+
 const tokenJwtAccountAdmin = jwt.sign(
   { sub: accountAdmin._id, id: accountAdmin._id },
   SECRET,
@@ -55,6 +63,7 @@ const insertTokensRefresh = async (tokens) => {
 module.exports = {
   tokenRefreshAccountOne,
   tokenRefreshAccountTwo,
+  tokenJwtAccountTwoExpired,
   tokenRefreshAccountAdmin,
   tokenJwtAccountOne,
   tokenJwtAccountTwo,

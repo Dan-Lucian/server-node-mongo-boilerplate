@@ -20,6 +20,7 @@ const {
   tokenRefreshAccountAdmin,
   tokenJwtAccountOne,
   tokenJwtAccountTwo,
+  tokenJwtAccountTwoExpired,
   tokenJwtAccountAdmin,
   insertTokensRefresh,
 } = require('../fixtures/token.fixture');
@@ -359,7 +360,7 @@ describe('Token manipulations', () => {
       ]);
     });
 
-    test.only('should return 401 if invalid or missing jwt is sent in Auth header', async () => {
+    test('should return 401 if invalid or missing jwt is sent in Auth header', async () => {
       const response = await api
         .post('/accounts/revoke-token')
         .set('Authorization', `bearer invalid_jwt_token`)
@@ -381,7 +382,7 @@ describe('Token manipulations', () => {
       expect(tokenRefreshFromDb.revoked).toBeUndefined();
     });
 
-    test.only("should successfully revoke a user's token", async () => {
+    test("should successfully revoke a user's token if token sent", async () => {
       await api
         .post('/accounts/revoke-token')
         .set('Authorization', `bearer ${tokenJwtAccountTwo}`)
@@ -395,7 +396,7 @@ describe('Token manipulations', () => {
       expect(tokenRefreshFromDb.revoked).toBeDefined();
     });
 
-    test.only('should return 401 if user revokes not his token', async () => {
+    test('should return 401 if user revokes not his token', async () => {
       await api
         .post('/accounts/revoke-token')
         .set('Authorization', `bearer ${tokenJwtAccountTwo}`)
@@ -409,7 +410,7 @@ describe('Token manipulations', () => {
       expect(tokenRefreshFromDb.revoked).toBeUndefined();
     });
 
-    test.only('should successfully revoke any token sent by an admin', async () => {
+    test('should successfully revoke any token sent by an admin', async () => {
       await api
         .post('/accounts/revoke-token')
         .set('Authorization', `bearer ${tokenJwtAccountAdmin}`)
@@ -421,6 +422,55 @@ describe('Token manipulations', () => {
       });
       expect(tokenRefreshFromDb.revokedByIp).toBeDefined();
       expect(tokenRefreshFromDb.revoked).toBeDefined();
+    });
+
+    test('should return 401 if jwt token is expired', async () => {
+      const response = await api
+        .post('/accounts/revoke-token')
+        .set('Authorization', `bearer ${tokenJwtAccountTwoExpired}`)
+        .send({ tokenRefresh: tokenRefreshAccountTwo.token })
+        .expect(401);
+
+      expect(response.body.message).toBe('expired token');
+
+      const tokenRefreshFromDb = await db.TokenRefresh.findOne({
+        token: tokenRefreshAccountTwo.token,
+      });
+      expect(tokenRefreshFromDb.revokedByIp).toBeUndefined();
+      expect(tokenRefreshFromDb.revoked).toBeUndefined();
+    });
+  });
+
+  describe('GET /accounts/revoke-token', () => {
+    beforeEach(async () => {
+      await insertAccounts([accountOne, accountTwo, accountAdmin]);
+      await insertTokensRefresh([
+        tokenRefreshAccountOne,
+        tokenRefreshAccountTwo,
+        tokenRefreshAccountAdmin,
+      ]);
+    });
+
+    test('should return 401 if invalid or missing or invalid refresh token', async () => {
+      const response = await api
+        .post('/accounts/revoke-token')
+        .set('Authorization', `bearer ${tokenJwtAccountTwo}`)
+        .send({ tokenRefresh: tokenRefreshAccountTwo.token })
+        .expect(401);
+
+      const response2 = await api
+        .post('/accounts/revoke-token')
+        .send({ tokenRefresh: tokenRefreshAccountTwo.token })
+        .expect(401);
+
+      expect(response.body.message).toBe('invalid token');
+      expect(response2.body.message).toBe('Unauthorized');
+
+      const tokenRefreshFromDb = await db.TokenRefresh.findOne({
+        token: tokenRefreshAccountTwo.token,
+      });
+      expect(tokenRefreshFromDb.revokedByIp).toBeUndefined();
+      expect(tokenRefreshFromDb.revoked).toBeUndefined();
     });
   });
 });

@@ -24,6 +24,9 @@ function errorHandler(error, request, response, next) {
     case error.name === 'JsonWebTokenError':
       return response.status(401).json({ message: 'invalid token' });
 
+    case error.name === 'TokenExpiredError':
+      return response.status(401).json({ message: 'expired token' });
+
     default:
       return response
         .status(500)
