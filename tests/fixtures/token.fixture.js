@@ -17,6 +17,13 @@ const tokenRefreshAccountTwo = {
   createdByIp: 'some ip address',
 };
 
+const tokenRefreshAccountTwoExpired = {
+  account: accountTwo._id,
+  token: 'a_very_unique_token_account_two_expired',
+  expires: Date.now() - 10, // expired
+  createdByIp: 'some ip address',
+};
+
 const tokenRefreshAccountAdmin = {
   account: accountAdmin._id,
   token: 'a_very_unique_token_account_admin',
@@ -63,6 +70,7 @@ const insertTokensRefresh = async (tokens) => {
 module.exports = {
   tokenRefreshAccountOne,
   tokenRefreshAccountTwo,
+  tokenRefreshAccountTwoExpired,
   tokenJwtAccountTwoExpired,
   tokenRefreshAccountAdmin,
   tokenJwtAccountOne,

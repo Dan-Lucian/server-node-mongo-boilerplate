@@ -108,25 +108,26 @@ async function refreshToken(request, response, next) {
 
 function schemaRevokeToken(request, response, next) {
   const schema = Joi.object({
-    tokenRefresh: Joi.string().required(),
+    tokenRefresh: Joi.string(),
   });
   validateRequest(request, next, schema);
 }
 
 async function revokeToken(request, response, next) {
-  // accept token from request body or cookie
-  const { tokenRefresh } = request.body;
-  const ipAddress = request.ip;
+  // if no refresh token in the httpOnly cookie then exit
+  if (!request.cookies.tokenRefresh)
+    throw 'missing refresh token from httpOnly cookie';
 
-  if (!tokenRefresh)
-    return response.status(400).json({ message: 'Token is required' });
+  const tokenRefresh =
+    request.body.tokenRefresh || request.cookies.tokenRefresh;
+  const ipAddress = request.ip;
 
   // users can revoke their own tokens and admins can revoke any tokens
   if (
     !request.user.ownsToken(tokenRefresh) &&
     request.user.role !== Role.Admin
   ) {
-    return response.status(401).json({ message: 'Unauthorized' });
+    throw 'unauthorized';
   }
 
   await accountService.revokeToken({ tokenRefresh, ipAddress });
@@ -184,7 +185,7 @@ async function getById(request, response, next) {
     request.params.id !== request.user.id &&
     request.user.role !== Role.Admin
   ) {
-    return response.status(401).json({ message: 'Unauthorized' });
+    throw 'unauthorized';
   }
 
   const account = await accountService.getById(request.params.id);
@@ -237,7 +238,7 @@ async function update(request, response, next) {
     request.params.id !== request.user.id &&
     request.user.role !== Role.Admin
   ) {
-    return response.status(401).json({ message: 'Unauthorized' });
+    throw 'unauthorized';
   }
 
   const account = await accountService.update(request.params.id, request.body);
@@ -250,7 +251,7 @@ async function _delete(request, response, next) {
     request.params.id !== request.user.id &&
     request.user.role !== Role.Admin
   ) {
-    return response.status(401).json({ message: 'Unauthorized' });
+    throw 'unauthorized';
   }
 
   await accountService.delete(request.params.id);

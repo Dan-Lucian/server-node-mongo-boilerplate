@@ -143,7 +143,7 @@ async function validateResetToken({ token }) {
     'resetToken.expires': { $gt: Date.now() },
   });
 
-  if (!account) throw 'Invalid token';
+  if (!account) throw 'invalid token';
 }
 
 async function resetPassword({ token, password }) {
@@ -152,7 +152,7 @@ async function resetPassword({ token, password }) {
     'resetToken.expires': { $gt: Date.now() },
   });
 
-  if (!account) throw 'Invalid token';
+  if (!account) throw 'invalid token';
 
   // update password and remove reset token
   account.passwordHash = await hash(password);
@@ -232,7 +232,9 @@ async function getTokenRefreshFromDb(token) {
   const tokenRefresh = await db.TokenRefresh.findOne({ token }).populate(
     'account'
   );
-  if (!tokenRefresh || !tokenRefresh.isActive) throw 'Invalid token';
+
+  if (!tokenRefresh) throw 'invalid token';
+  if (!tokenRefresh.isActive) throw 'expired token';
   return tokenRefresh;
 }
 

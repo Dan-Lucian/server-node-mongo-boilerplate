@@ -5,11 +5,23 @@ module.exports = errorHandler;
 function errorHandler(error, request, response, next) {
   switch (true) {
     case typeof error === 'string':
-      // custom application error
-      const is404 = error.toLowerCase().endsWith('not found');
-      const is401 = error === 'Incorrect email or password';
-      const statusCode = is404 ? 404 : is401 ? 401 : 400;
-      return response.status(statusCode).json({ message: error });
+      const errorNormalized = error.toLowerCase();
+      switch (true) {
+        case errorNormalized.endsWith('not found'):
+          return response.status(404).json({ message: errorNormalized });
+
+        case errorNormalized === 'unauthorized':
+          return response.status(401).json({ message: errorNormalized });
+
+        case errorNormalized === 'incorrect email or password':
+          return response.status(401).json({ message: errorNormalized });
+
+        case errorNormalized === 'expired token':
+          return response.status(401).json({ message: errorNormalized });
+
+        default:
+          return response.status(400).json({ message: errorNormalized });
+      }
 
     case error.name === 'ValidationError':
       // mongoose validation error
@@ -19,10 +31,10 @@ function errorHandler(error, request, response, next) {
 
     case error.name === 'UnauthorizedError':
       // jwt authentication error
-      return response.status(401).json({ message: 'Unauthorized' });
+      return response.status(401).json({ message: 'unauthorized' });
 
     case error.name === 'JsonWebTokenError':
-      return response.status(401).json({ message: 'invalid token' });
+      return response.status(400).json({ message: 'invalid token' });
 
     case error.name === 'TokenExpiredError':
       return response.status(401).json({ message: 'expired token' });

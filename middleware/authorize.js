@@ -17,12 +17,14 @@ function authorize(roles = []) {
     // authenticate JWT token and attach user to request object (request.user)
     async (request, response, next) => {
       const authorization = request.get('authorization');
-      if (authorization && authorization.toLowerCase().startsWith('bearer ')) {
-        const tokenDecoded = jwt.verify(authorization.substring(7), SECRET);
-        request.user = tokenDecoded;
-      } else {
-        return response.status(401).json({ message: 'Unauthorized' });
-      }
+
+      if (!authorization) throw 'invalid token';
+      if (!authorization.toLowerCase().startsWith('bearer '))
+        throw 'invalid token';
+
+      // if token invalid it will throw an error by itself
+      const tokenDecoded = jwt.verify(authorization.substring(7), SECRET);
+      request.user = tokenDecoded;
 
       next();
     },
@@ -37,7 +39,7 @@ function authorize(roles = []) {
         (arrayRoles.length && !arrayRoles.includes(account.role))
       ) {
         // account no longer exists or role not authorized
-        return response.status(401).json({ message: 'Unauthorized' });
+        throw 'unauthorized';
       }
 
       // authentication and authorization successful

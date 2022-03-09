@@ -1,6 +1,7 @@
 {
   "extends": ["wesbos"],
   "rules": {
-    "no-use-before-define": "off"
+    "no-use-before-define": "off",
+    "no-throw-literal": "off"
   }
 }
