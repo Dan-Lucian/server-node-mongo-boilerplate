@@ -10,8 +10,7 @@ const accountService = require('./account.service');
 
 // routes
 router.post('/register', schemaRegister, register);
-router.get('/verify-email', verifyEmailWithGet);
-router.post('/verify-email', schemaVerifyEmail, verifyEmailWithPost);
+router.post('/verify-email', schemaVerifyEmail, verifyEmail);
 router.post('/authenticate', schemaAuthenticate, authenticate);
 router.post('/refresh-token', refreshToken);
 router.post('/revoke-token', authorize(), schemaRevokeToken, revokeToken);
@@ -58,15 +57,8 @@ function schemaVerifyEmail(request, response, next) {
   validateRequest(request, next, schema);
 }
 
-async function verifyEmailWithPost(request, response, next) {
+async function verifyEmail(request, response, next) {
   await accountService.verifyEmail(request.body);
-
-  response.json({ message: 'Verification successful, you can now login' });
-}
-
-async function verifyEmailWithGet(request, response, next) {
-  const { token } = request.query;
-  await accountService.verifyEmail({ token });
 
   response.json({ message: 'Verification successful, you can now login' });
 }

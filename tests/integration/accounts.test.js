@@ -1,5 +1,3 @@
-// https://github.com/hagopj13/node-express-boilerplate/tree/master/tests/integration
-
 const supertest = require('supertest');
 const mongoose = require('mongoose');
 const jwt = require('jsonwebtoken');
@@ -165,46 +163,6 @@ describe('Registration', () => {
       sameEmail.userName = 'differentUserName';
       sameEmail.email = accountOne.email;
       await api.post('/accounts/register').send(sameEmail).expect(400);
-    });
-  });
-
-  describe('GET /accounts/verify-email', () => {
-    beforeEach(async () => {
-      await insertAccounts([accountUnverified]);
-    });
-
-    test('should activate account if token url param is correct', async () => {
-      const accountFromDbAtStart = await db.Account.findOne({
-        email: accountOne.email,
-      });
-      expect(accountFromDbAtStart.verified).toBeUndefined();
-      expect(accountFromDbAtStart.verificationToken).toBeDefined();
-
-      const response = await api
-        .get(
-          `/accounts/verify-email?token=${accountFromDbAtStart.verificationToken}`
-        )
-        .expect(200);
-      expect(response.body.message).toBe(
-        'Verification successful, you can now login'
-      );
-
-      const accountFromDbAtEnd = await db.Account.findOne({
-        email: accountOne.email,
-      });
-      expect(accountFromDbAtEnd.verified).toBeDefined();
-      expect(accountFromDbAtEnd.verificationToken).toBeUndefined();
-    });
-
-    test('should return 400 if token url param is wrong or missing', async () => {
-      await api.get('/accounts/verify-email?token=wrongToken').expect(400);
-      await api.get('/accounts/verify-email').expect(400);
-
-      const accountFromDbAtEnd = await db.Account.findOne({
-        email: accountOne.email,
-      });
-      expect(accountFromDbAtEnd.verified).toBeUndefined();
-      expect(accountFromDbAtEnd.verificationToken).toBe('1234567890');
     });
   });
 
