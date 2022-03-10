@@ -24,6 +24,10 @@ const accountOne = {
   email: 'test1@mail.com',
   passwordHash,
   role: role.User,
+  resetToken: {
+    token: 'reset-token-one',
+    expires: new Date(Date.now() + 24 * 60 * 60 * 1000),
+  },
 };
 
 const accountTwo = {
@@ -35,6 +39,23 @@ const accountTwo = {
   email: 'test2@mail.com',
   passwordHash,
   role: role.User,
+  resetToken: {
+    token: 'reset-token-two',
+    expires: new Date(Date.now() + 24 * 60 * 60 * 1000),
+  },
+};
+
+const accountTokenResetExpired = {
+  ...accountTwo,
+  _id: mongoose.Types.ObjectId(),
+  email: 'test-expired@mail.com',
+  userName: 'userName expired',
+  resetToken: {
+    resetToken: {
+      token: 'reset-token-expired',
+      expires: Date.now() - 10,
+    },
+  },
 };
 
 const accountAdmin = {
@@ -46,6 +67,10 @@ const accountAdmin = {
   email: 'test-admin@mail.com',
   passwordHash,
   role: role.Admin,
+  resetToken: {
+    token: 'reset-token-admin',
+    expires: new Date(Date.now() + 24 * 60 * 60 * 1000),
+  },
 };
 
 const insertAccounts = async (accounts) => {
@@ -57,6 +82,7 @@ const insertAccounts = async (accounts) => {
 module.exports = {
   accountOne,
   accountTwo,
+  accountTokenResetExpired,
   accountAdmin,
   insertAccounts,
   accountRegistration,

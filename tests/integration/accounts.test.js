@@ -10,6 +10,7 @@ const { SECRET } = require('../../utils/config');
 const {
   accountOne,
   accountTwo,
+  accountTokenResetExpired,
   accountAdmin,
   insertAccounts,
   accountRegistration,
@@ -222,7 +223,7 @@ describe('Registration', () => {
   });
 });
 
-describe('Authenticate', () => {
+describe('Authentication', () => {
   describe('POST /accounts/authenticate', () => {
     beforeEach(async () => {
       await insertAccounts([accountOne, accountTwo, accountAdmin]);
@@ -504,34 +505,163 @@ describe('Token manipulations', () => {
   });
 });
 
-// test('fails with 401 and error message if username not found', async () => {
-//   const userToLogin = {
-//     username: 'wrongLogin',
-//     password: 'admin',
-//   };
+describe('Reseting the password', () => {
+  beforeEach(async () => {
+    await insertAccounts([
+      accountOne,
+      accountTwo,
+      accountAdmin,
+      accountTokenResetExpired,
+    ]);
+  });
 
-//   const response = await api
-//     .post('/api/login')
-//     .send(userToLogin)
-//     .expect(401)
-//     .expect('Content-Type', /application\/json/);
+  describe('POST /accounts/forgot-password', () => {
+    test('should return 400 if no email sent', async () => {
+      await api.post('/accounts/forgot-password').expect(400);
+    });
 
-//   expect(response.body.error).toBe('invalid username or password');
-//   expect(response.body.token).toBeUndefined();
-// });
+    test('should return 400 if invalid email sent', async () => {
+      await api
+        .post('/accounts/forgot-password')
+        .send({ email: 'invalid_email' })
+        .expect(400);
+    });
 
-// test('fails with 401 and error message if password is wrong', async () => {
-//   const userToLogin = {
-//     username: 'admin',
-//     password: 'wrongPassword',
-//   };
+    test('should return 200 if email not found in db', async () => {
+      await api
+        .post('/accounts/forgot-password')
+        .send({ email: 'email_that_is_not_in_db@mail.com' })
+        .expect(200);
+    });
 
-//   const response = await api
-//     .post('/api/login')
-//     .send(userToLogin)
-//     .expect(401)
-//     .expect('Content-Type', /application\/json/);
+    test('should create a reset token on the account in db if email found', async () => {
+      await api
+        .post('/accounts/forgot-password')
+        .send({ email: accountTwo.email })
+        .expect(200);
 
-//   expect(response.body.error).toBe('invalid username or password');
-//   expect(response.body.token).toBeUndefined();
-// });
+      const accountFromDb = await db.Account.findOne({
+        email: accountTwo.email,
+      });
+      expect(accountFromDb.resetToken.token).toBeDefined();
+      expect(accountFromDb.resetToken.token).not.toBe(
+        accountTwo.resetToken.token
+      );
+    });
+  });
+
+  describe('POST /accounts/reset-password', () => {
+    test('should return 400 if any of essential data is missing', async () => {
+      await api
+        .post('/accounts/reset-password')
+        .send({ token: accountTwo.resetToken.token, password: '87654321' })
+        .expect(400);
+
+      await api
+        .post('/accounts/reset-password')
+        .send({
+          token: accountTwo.resetToken.token,
+          passwordConfirm: '87654321',
+        })
+        .expect(400);
+
+      await api
+        .post('/accounts/reset-password')
+        .send({ password: '87654321', passwordConfirm: '87654321' })
+        .expect(400);
+
+      const accountFromDb = await db.Account.findOne({
+        email: accountTwo.email,
+      });
+      expect(accountFromDb.passwordHash).toBe(accountTwo.passwordHash);
+    });
+
+    test('should return 400 if password too short', async () => {
+      await api
+        .post('/accounts/reset-password')
+        .send({
+          token: accountTwo.resetToken.token,
+          password: '7654321',
+          passwordConfirm: '7654321',
+        })
+        .expect(400);
+
+      const accountFromDb = await db.Account.findOne({
+        email: accountTwo.email,
+      });
+      expect(accountFromDb.passwordHash).toBe(accountTwo.passwordHash);
+    });
+
+    test('should return 400 if passwords mismatch', async () => {
+      await api
+        .post('/accounts/reset-password')
+        .send({
+          token: accountTwo.resetToken.token,
+          password: '97654321',
+          passwordConfirm: '87654321',
+        })
+        .expect(400);
+
+      await api
+        .post('/accounts/reset-password')
+        .send({
+          token: accountTwo.resetToken.token,
+          password: '87654321',
+          passwordConfirm: '97654321',
+        })
+        .expect(400);
+
+      const accountFromDb = await db.Account.findOne({
+        email: accountTwo.email,
+      });
+      expect(accountFromDb.passwordHash).toBe(accountTwo.passwordHash);
+    });
+
+    test('should return 400 if reset token expired', async () => {
+      await api
+        .post('/accounts/reset-password')
+        .send({
+          token: accountTokenResetExpired.resetToken.token,
+          password: '87654321',
+          passwordConfirm: '87654321',
+        })
+        .expect(400);
+
+      const accountFromDb = await db.Account.findOne({
+        email: accountTokenResetExpired.email,
+      });
+      expect(accountFromDb.passwordHash).toBe(
+        accountTokenResetExpired.passwordHash
+      );
+    });
+
+    test('should change password if data valid', async () => {
+      await api
+        .post('/accounts/reset-password')
+        .send({
+          token: accountTwo.resetToken.token,
+          password: '87654321',
+          passwordConfirm: '87654321',
+        })
+        .expect(200);
+
+      const accountFromDb = await db.Account.findOne({
+        email: accountTwo.email,
+      });
+      expect(accountFromDb.passwordHash).toBeDefined();
+      expect(accountFromDb.resetToken.token).toBeUndefined();
+
+      const isNewPasswordCorrect = await bcrypt.compare(
+        '87654321',
+        accountFromDb.passwordHash
+      );
+      const isOldPasswordCorrect = await bcrypt.compare(
+        '12345678',
+        accountFromDb.passwordHash
+      );
+
+      expect(isNewPasswordCorrect).toBe(true);
+      expect(isOldPasswordCorrect).toBe(false);
+    });
+  });
+});

@@ -163,7 +163,7 @@ async function validateResetToken(request, response, next) {
 function schemaResetPassword(request, response, next) {
   const schema = Joi.object({
     token: Joi.string().required(),
-    password: Joi.string().min(6).required(),
+    password: Joi.string().min(8).required(),
     passwordConfirm: Joi.string().valid(Joi.ref('password')).required(),
   });
   validateRequest(request, next, schema);
