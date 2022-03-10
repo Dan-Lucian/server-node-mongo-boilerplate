@@ -18,8 +18,9 @@ const {
 const {
   tokenRefreshAccountOne,
   tokenRefreshAccountTwo,
-  tokenRefreshAccountTwoExpired,
   tokenRefreshAccountAdmin,
+  tokenRefreshAccountTwoExpired,
+  tokenJwtAccountAdminExpired,
   tokenJwtAccountOne,
   tokenJwtAccountTwo,
   tokenJwtAccountTwoExpired,
@@ -388,8 +389,8 @@ describe('Token manipulations', () => {
         .send({ tokenRefresh: tokenRefreshAccountTwo.token })
         .expect(400);
 
-      expect(response.body.message).toBe('invalid token');
-      expect(response2.body.message).toBe('invalid token');
+      expect(response.body).toEqual({ message: 'invalid token' });
+      expect(response2.body).toEqual({ message: 'invalid token' });
 
       const tokenRefreshFromDb = await db.TokenRefresh.findOne({
         token: tokenRefreshAccountTwo.token,
@@ -662,6 +663,120 @@ describe('Reseting the password', () => {
 
       expect(isNewPasswordCorrect).toBe(true);
       expect(isOldPasswordCorrect).toBe(false);
+    });
+  });
+});
+
+describe('Viewing the accounts', () => {
+  beforeEach(async () => {
+    await insertAccounts([
+      accountOne,
+      accountTwo,
+      accountAdmin,
+      accountTokenResetExpired,
+    ]);
+  });
+
+  describe('GET /accounts', () => {
+    test('should return 400 if invalid or missing jwt is sent in Auth header', async () => {
+      const response = await api
+        .get('/accounts')
+        .set('Authorization', `bearer invalid_jwt_token`)
+        .expect(400);
+
+      const response2 = await api.get('/accounts').expect(400);
+
+      expect(response.body).toEqual({ message: 'invalid token' });
+      expect(response2.body).toEqual({ message: 'invalid token' });
+    });
+
+    test('should return 401 if jwt token is expired', async () => {
+      const response = await api
+        .get('/accounts')
+        .set('Authorization', `bearer ${tokenJwtAccountAdminExpired}`)
+        .expect(401);
+
+      expect(response.body).toEqual({ message: 'expired token' });
+    });
+
+    test('should return 401 if non admin', async () => {
+      const response = await api
+        .get('/accounts')
+        .set('Authorization', `bearer ${tokenJwtAccountTwo}`)
+        .expect(401);
+
+      expect(response.body).toEqual({ message: 'unauthorized' });
+    });
+
+    test('should return accounts if admin and token valid', async () => {
+      const response = await api
+        .get('/accounts')
+        .set('Authorization', `bearer ${tokenJwtAccountAdmin}`)
+        .expect(200);
+
+      expect(response.body).toHaveLength(4);
+    });
+  });
+
+  describe('GET /accounts/:id', () => {
+    test('should return 400 if invalid or missing jwt is sent in Auth header', async () => {
+      const response = await api
+        .get(`/accounts/${accountOne._id}`)
+        .set('Authorization', `bearer invalid_jwt_token`)
+        .expect(400);
+
+      const response2 = await api.get('/accounts').expect(400);
+
+      expect(response.body).toEqual({ message: 'invalid token' });
+      expect(response2.body).toEqual({ message: 'invalid token' });
+    });
+
+    test('should return 401 if jwt token is expired', async () => {
+      const response = await api
+        .get(`/accounts/${accountOne._id}`)
+        .set('Authorization', `bearer ${tokenJwtAccountAdminExpired}`)
+        .expect(401);
+
+      expect(response.body).toEqual({ message: 'expired token' });
+    });
+
+    test('should return 401 if non admin requests not his account', async () => {
+      const response = await api
+        .get(`/accounts/${accountOne._id}`)
+        .set('Authorization', `bearer ${tokenJwtAccountTwo}`)
+        .expect(401);
+
+      expect(response.body).toEqual({ message: 'unauthorized' });
+    });
+
+    test('should return account if non admin requests his account', async () => {
+      const response = await api
+        .get(`/accounts/${accountTwo._id}`)
+        .set('Authorization', `bearer ${tokenJwtAccountTwo}`)
+        .expect(200);
+
+      expect(response.body).toMatchObject({
+        id: accountTwo._id.toString(),
+        userName: accountTwo.userName,
+        firstName: accountTwo.firstName,
+        lastName: accountTwo.lastName,
+        email: accountTwo.email,
+      });
+    });
+
+    test('should return account if admin requests any account', async () => {
+      const response = await api
+        .get(`/accounts/${accountTwo._id}`)
+        .set('Authorization', `bearer ${tokenJwtAccountAdmin}`)
+        .expect(200);
+
+      expect(response.body).toMatchObject({
+        id: accountTwo._id.toString(),
+        userName: accountTwo.userName,
+        firstName: accountTwo.firstName,
+        lastName: accountTwo.lastName,
+        email: accountTwo.email,
+      });
     });
   });
 });
