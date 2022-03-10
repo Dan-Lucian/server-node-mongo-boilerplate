@@ -20,7 +20,7 @@ function errorHandler(error, request, response, next) {
           return response.status(401).json({ message: errorNormalized });
 
         default:
-          return response.status(400).json({ message: errorNormalized });
+          return response.status(400).json({ message: error });
       }
 
     case error.name === 'ValidationError':

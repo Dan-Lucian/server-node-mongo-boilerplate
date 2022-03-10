@@ -197,11 +197,11 @@ async function getById(request, response, next) {
 
 function schemaCreate(request, response, next) {
   const schema = Joi.object({
-    userName: Joi.string().required(),
-    firstName: Joi.string().required(),
-    lastName: Joi.string().required(),
+    userName: Joi.string().min(3).required(),
+    firstName: Joi.string().min(1).required(),
+    lastName: Joi.string().min(1).required(),
     email: Joi.string().email().required(),
-    password: Joi.string().min(5).required(),
+    password: Joi.string().min(8).required(),
     passwordConfirm: Joi.string().valid(Joi.ref('password')).required(),
     role: Joi.string().valid(Role.Admin, Role.User).required(),
   });
@@ -219,7 +219,7 @@ function schemaUpdate(request, response, next) {
     firstName: Joi.string().empty(''),
     lastName: Joi.string().empty(''),
     email: Joi.string().email().empty(''),
-    password: Joi.string().min(5).empty(''),
+    password: Joi.string().min(8).empty(''),
     passwordConfirm: Joi.string().valid(Joi.ref('password')).empty(''),
   };
 
@@ -255,7 +255,7 @@ async function _delete(request, response, next) {
   }
 
   await accountService.delete(request.params.id);
-  response.json({ message: 'Account deleted successfully' });
+  response.json({ message: 'account deleted successfully' });
 }
 
 // helper functions

@@ -198,7 +198,16 @@ async function update(id, params) {
     account.email !== params.email &&
     (await db.Account.findOne({ email: params.email }))
   ) {
-    throw `Email "${params.email}" is already taken`;
+    throw `email "${params.email}" is already taken`;
+  }
+
+  // validate (if userName was changed)
+  if (
+    params.userName &&
+    account.userName !== params.userName &&
+    (await db.Account.findOne({ userName: params.userName }))
+  ) {
+    throw `username "${params.userName}" is already taken`;
   }
 
   // hash password if it was entered
@@ -222,9 +231,9 @@ async function _delete(id) {
 // helper functions
 
 async function getAccount(id) {
-  if (!db.isValidId(id)) throw 'Account not found';
+  if (!db.isValidId(id)) throw 'account not found';
   const account = await db.Account.findById(id);
-  if (!account) throw 'Account not found';
+  if (!account) throw 'account not found';
   return account;
 }
 
