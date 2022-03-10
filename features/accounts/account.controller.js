@@ -116,7 +116,7 @@ function schemaRevokeToken(request, response, next) {
 async function revokeToken(request, response, next) {
   // if no refresh token in the httpOnly cookie then exit
   if (!request.cookies.tokenRefresh)
-    throw 'missing refresh token from httpOnly cookie';
+    throw 'missing refresh token from the httpOnly cookie';
 
   const tokenRefresh =
     request.body.tokenRefresh || request.cookies.tokenRefresh;
@@ -210,7 +210,7 @@ function schemaCreate(request, response, next) {
 
 async function create(request, response, next) {
   const account = await accountService.create(request.body);
-  response.json(account);
+  response.status(201).json(account);
 }
 
 function schemaUpdate(request, response, next) {

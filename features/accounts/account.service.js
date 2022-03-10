@@ -174,7 +174,11 @@ async function getById(id) {
 async function create(params) {
   // validate
   if (await db.Account.findOne({ email: params.email })) {
-    throw `Email "${params.email}" is already registered`;
+    throw `email "${params.email}" is already registered`;
+  }
+
+  if (await db.Account.findOne({ userName: params.userName })) {
+    throw `username "${params.userName}" is already taken`;
   }
 
   const account = new db.Account(params);

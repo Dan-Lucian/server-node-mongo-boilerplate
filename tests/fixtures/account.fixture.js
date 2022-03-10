@@ -7,12 +7,24 @@ const password = '12345678';
 const passwordHash = bcrypt.hashSync(password, 10);
 
 const accountRegistration = {
-  userName: 'adam',
-  firstName: 'Adam',
-  lastName: 'Black',
-  email: 'test@mail.com',
+  userName: 'userName 0',
+  firstName: 'firstName 0',
+  lastName: 'lastName 0',
+  email: 'test0@mail.com',
   password: '12345678',
   passwordConfirm: '12345678',
+  role: role.Admin, // will be ignored at real registration but used when create
+};
+
+const accountUnverified = {
+  _id: mongoose.Types.ObjectId(),
+  userName: 'userName unverified',
+  firstName: 'firstName unverified',
+  lastName: 'lastName unverified',
+  email: 'testunverified@mail.com',
+  verificationToken: '1234567890',
+  passwordHash,
+  role: role.User,
 };
 
 const accountOne = {
@@ -80,10 +92,11 @@ const insertAccounts = async (accounts) => {
 };
 
 module.exports = {
+  accountRegistration,
+  accountUnverified,
   accountOne,
   accountTwo,
   accountTokenResetExpired,
   accountAdmin,
   insertAccounts,
-  accountRegistration,
 };
