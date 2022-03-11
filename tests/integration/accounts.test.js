@@ -4,7 +4,7 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 const db = require('../../utils/db');
 const app = require('../../app');
-const { SECRET } = require('../../utils/config');
+const { SECRET } = require('../../config/env');
 const role = require('../../utils/role');
 const {
   accountRegistration,

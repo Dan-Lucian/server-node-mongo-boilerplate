@@ -1,6 +1,6 @@
 const jwt = require('jsonwebtoken');
 const db = require('../utils/db');
-const { SECRET } = require('../utils/config');
+const { SECRET } = require('../config/env');
 
 const extractorUser = async (request, response, next) => {
   const authorization = request.get('authorization');

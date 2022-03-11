@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 const Account = require('../features/accounts/account.model');
 const TokenRefresh = require('../features/accounts/token-refresh.model');
-const { MONGODB_URI } = require('./config');
+const { MONGODB_URI } = require('../config/env');
 const logger = require('./logger');
 
 mongoose

@@ -5,7 +5,7 @@ const bcrypt = require('bcrypt');
 const crypto = require('crypto');
 const sendEmail = require('../../utils/send-email');
 const Role = require('../../utils/role');
-const { SECRET } = require('../../utils/config');
+const { SECRET } = require('../../config/env');
 const db = require('../../utils/db');
 
 module.exports = {

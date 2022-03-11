@@ -1,7 +1,7 @@
 const jwt = require('jsonwebtoken');
 const db = require('../../utils/db');
 const { accountOne, accountTwo, accountAdmin } = require('./account.fixture');
-const { SECRET } = require('../../utils/config');
+const { SECRET } = require('../../config/env');
 
 const tokenRefreshAccountOne = {
   account: accountOne._id,

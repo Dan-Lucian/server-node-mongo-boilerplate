@@ -1,7 +1,7 @@
 const jwt = require('jsonwebtoken');
 const db = require('../utils/db');
 const TokenRefresh = require('../features/accounts/token-refresh.model');
-const { SECRET } = require('../utils/config');
+const { SECRET } = require('../config/env');
 
 module.exports = authorize;
 
