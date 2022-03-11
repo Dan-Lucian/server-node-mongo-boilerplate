@@ -51,16 +51,16 @@ The bulk of authorization is done by the `/middleware/authorize.js` middleware, 
 
 ## API
 
-**Authentication routes:**
-`POST /accounts/register`
-`POST /accounts/verify-email`
-`POST /accounts/authenticate`
-`POST /accounts/refresh-token` - refresh the jwt token
-`POST /accounts/revoke-token` - revoke the refresh token
-`POST /accounts/forgot-password`
-`POST /accounts/validate-reset-token`
-`POST /accounts/reset-password`
-`POST /accounts` - create an account
+**Authentication routes:**<br/>
+`POST /accounts/register`<br/>
+`POST /accounts/verify-email`<br/>
+`POST /accounts/authenticate`<br/>
+`POST /accounts/refresh-token` - refresh the jwt token<br/>
+`POST /accounts/revoke-token` - revoke the refresh token<br/>
+`POST /accounts/forgot-password`<br/>
+`POST /accounts/validate-reset-token`<br/>
+`POST /accounts/reset-password`<br/>
+`POST /accounts` - create an account<br/>
 
 `GET /accounts` - get all accounts
 `GET /accounts/:id`
